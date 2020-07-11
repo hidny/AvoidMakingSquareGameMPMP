@@ -4,7 +4,7 @@ import env.Board;
 
 public class AlphaBetaPrunePlayer implements player.Player {
 
-	public static int numCallsToAlphaBeta = 0;
+	public static long numCallsToAlphaBeta = 0;
 	
 	//TODO: maybe print the evals?
 	public int getBestMove(Board node, int depth) {

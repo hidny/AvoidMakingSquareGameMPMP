@@ -1,5 +1,7 @@
 package env;
 
+import java.math.BigInteger;
+
 //TODO: make a new board designed for even more speed and hashing...
 
 // board that handles to avoid square game
@@ -378,6 +380,7 @@ public class Board {
 			return true;
 		}
 	}
+
 	//TODO: make less naive
 	public double naiveShallowEval() {
 		if(this.P1turn) {
@@ -405,9 +408,36 @@ public class Board {
 		}
 	}
 
-	//TODO I should make a hash with collisions
-	public static int hash() {
-		return -1;
+	
+	//TODO: might be able to make it keep track of uniqueCode after every mode
+	// I might do it if I extend the Board class.
+	
+	public BigInteger getUniqueCode() {
+		
+		BigInteger ret = BigInteger.ZERO;
+		
+		BigInteger BASE = new BigInteger("" + Constants.NUM_STATES_PER_ELEMENT);
+
+		BigInteger TWO = new BigInteger("2");
+		
+		for(int i=0; i<this.table.length; i++) {
+			for(int j=0; j<this.table[i].length; j++) {
+				
+				if(table[i][j] == Constants.EMPTY) {
+					ret = ret.multiply(BASE);
+					
+				} else if(table[i][j] == Constants.P1_COLOUR) {
+					ret = ret.multiply(BASE).add(BigInteger.ONE);
+					
+				} else {
+					ret = ret.multiply(BASE).add(TWO);
+					
+				}
+				
+			}
+		}
+		
+		return ret;
 	}
 	
 }

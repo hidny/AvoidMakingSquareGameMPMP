@@ -4,7 +4,7 @@ import env.Board;
 
 public class MinMaxPlayer implements player.Player {
 
-	public static int numCallsToMinMax = 0;
+	public static long numCallsToMinMax = 0;
 	
 	//TODO: maybe print the evals?
 	public int getBestMove(Board node, int depth) {

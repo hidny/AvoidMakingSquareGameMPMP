@@ -1,6 +1,7 @@
 package main;
 
 import aiAlgo.AlphaBetaPrunePlayer;
+import aiAlgo.AlphaBetaPrunePlayerWithMemory;
 import aiAlgo.MinMaxPlayer;
 import consolePlayer.ConsolePlayer;
 import env.Board;
@@ -14,11 +15,15 @@ public class GameStarter {
 	//I don't know if there's a bug or if that's actually true.
 	//Will investigate further.
 	
+	//For size =4:
+	//On move 1:
+	//Player 1 concedes defeat!
 
 	public static void main(String[] args) {
-		Constants.SIZE = 4;
+		Constants.SIZE = 5;
 		//ComputerHumanVsAlphaBeta();
-		ComputerAlphaBetaVsAlphaBeta();
+		//ComputerAlphaBetaVsAlphaBeta();
+		ComputerAlphaBetaMemVsAlphaBetaMem();
 	}
 	
 	public static void ComputerMinMaxVsHuman() {
@@ -39,9 +44,15 @@ public class GameStarter {
 		
 	}
 	
-	public static void ComputerHumanVsAlphaBeta() {
+	public static void HumanVsAlphaBeta() {
 		System.out.println("Human vs Computer (alpha beta)");
 		PlayGame(new ConsolePlayer(), new AlphaBetaPrunePlayer());
+		
+	}
+	
+	public static void ComputerAlphaBetaMemVsAlphaBetaMem() {
+		System.out.println("Computer (alpha beta with memory) vs Computer (alpha beta with memory)");
+		PlayGame(new AlphaBetaPrunePlayerWithMemory(), new AlphaBetaPrunePlayerWithMemory());
 		
 	}
 	
