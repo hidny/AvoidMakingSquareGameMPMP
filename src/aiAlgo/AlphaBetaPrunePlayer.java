@@ -2,7 +2,7 @@ package aiAlgo;
 
 import env.Board;
 
-public class AlphaBetaPrunePlayer implements player.Player {
+public class AlphaBetaPrunePlayer implements player.PlayerI {
 
 	public static long numCallsToAlphaBeta = 0;
 	

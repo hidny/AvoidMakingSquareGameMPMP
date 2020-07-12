@@ -1,6 +1,8 @@
-package env;
+package solveMPMP;
 
 import java.math.BigInteger;
+
+import env.Constants;
 
 //TODO: make a new board designed for even more speed and hashing...
 
@@ -8,18 +10,21 @@ import java.math.BigInteger;
 //It's a little bit faster because it keeps tract of moves available for Player 1 and Player2 and
 // keeps that in memory.
 
-public class Board {
+public class SolitaryBoard {
 
 	public int[][] getTable() {
 		return table;
 	}
 
-	public boolean isP1turn() {
-		return P1turn;
-	}
-
 	public int getNumPieces() {
 		return numPieces;
+	}
+
+	public int getNumPiecesForPlayer1() {
+		return numPiecesForPlayer1;
+	}
+	public int getNumPiecesForPlayer2() {
+		return numPieces - numPiecesForPlayer1;
 	}
 
 	public boolean[][] getP1Movable() {
@@ -32,25 +37,25 @@ public class Board {
 
 	public static void main(String args[]) {
 		
-		Board board = new Board();
+		SolitaryBoard board = new SolitaryBoard(Constants.SIZE);
 		board.draw();
 		
 		for(int i=0; i<5; i++) {
-			board = board.moveNullOnLoss(i, 0);
-			board = board.moveNullOnLoss(i, 1);
+			board = board.moveNullOnLoss(i, 0, true);
+			board = board.moveNullOnLoss(i, 1, false);
 			board.draw();
 		}
 		for(int i=0; i<5; i++) {
-			board = board.moveNullOnLoss(i, 2);
-			board = board.moveNullOnLoss(i, 3);
+			board = board.moveNullOnLoss(i, 2, true);
+			board = board.moveNullOnLoss(i, 3, false);
 			board.draw();
 		}
 	}
 	
 	private int table[][];
 	private int numPieces;
-	 
-	private boolean P1turn;
+	private int numPiecesForPlayer1;
+
 	
 	private boolean P1Movable[][];
 	private boolean P2Movable[][];
@@ -58,12 +63,12 @@ public class Board {
 	//Keep track of number of choices to make everything go faster...
 	//(Do this later...)
 	
-	public Board() {
-		this.table = new int[Constants.SIZE][Constants.SIZE];
-		this.P1Movable = new boolean[Constants.SIZE][Constants.SIZE];
-		this.P2Movable  = new boolean[Constants.SIZE][Constants.SIZE];
-		P1turn = true;
-		numPieces = 0;
+	public SolitaryBoard(int size) {
+		this.table = new int[size][size];
+		this.P1Movable = new boolean[size][size];
+		this.P2Movable  = new boolean[size][size];
+		this.numPieces = 0;
+		this.numPiecesForPlayer1 = 0;
 		
 		for(int i=0; i<table.length; i++) {
 			for(int j=0; j<table[i].length; j++) {
@@ -75,12 +80,12 @@ public class Board {
 		
 	}
 	
-	public Board(int table[][], boolean P1Movable[][], boolean P2Movable[][], boolean P1Turn, int numPieces) {
-		this.table = new int[Constants.SIZE][Constants.SIZE];
-		this.P1Movable = new boolean[Constants.SIZE][Constants.SIZE];
-		this.P2Movable  = new boolean[Constants.SIZE][Constants.SIZE];
-		this.P1turn = P1Turn;
+	public SolitaryBoard(int table[][], boolean P1Movable[][], boolean P2Movable[][], int numPieces, int numPiecesForPlayer1) {
+		this.table = new int[table.length][table.length];
+		this.P1Movable = new boolean[table.length][table.length];
+		this.P2Movable  = new boolean[table.length][table.length];
 		this.numPieces = numPieces;
+		this.numPiecesForPlayer1 = numPiecesForPlayer1;
 		
 		for(int i=0; i<table.length; i++) {
 			for(int j=0; j<table[i].length; j++) {
@@ -160,26 +165,20 @@ public class Board {
 		}
 		ret += "\n";
 		
-		if(this.P1turn) {
-			ret += "Player 1's turn\n\n";
-		} else {
-			ret += "Player 2's turn\n\n";
-			
-		}
 		
 		ret += "----------------------------";
 
 		return ret;
 	}
 
-	public Board moveNullOnLoss(int code) {
-		return moveNullOnLoss(code / Constants.SIZE, code % Constants.SIZE);
+	public SolitaryBoard moveNullOnLoss(int code, boolean isP1turn) {
+		return moveNullOnLoss(code / table.length, code % table.length, isP1turn);
 	}
 	
-	public Board moveNullOnLoss(int i, int j) {
+	public SolitaryBoard moveNullOnLoss(int i, int j, boolean isP1turn) {
 		
-		if( (P1turn && P1Movable[i][j]) || (!P1turn && P2Movable[i][j])) {
-			return this.playMove(i, j);
+		if( (isP1turn && P1Movable[i][j]) || (!isP1turn && P2Movable[i][j])) {
+			return this.playMove(i, j, isP1turn);
 
 		} else {
 			return null;
@@ -187,46 +186,45 @@ public class Board {
 		}
 	}
 	
-	public Board playMove(int code) {
-		return playMove(code / Constants.SIZE, code % Constants.SIZE);
+	public SolitaryBoard playMove(int code, boolean isP1turn) {
+		return playMove(code / table.length, code % table.length, isP1turn);
 	}
 	
-	public Board playMove(int i, int j) {
-		Board newBoard = hardCopyForNextRound();
+	public SolitaryBoard playMove(int i, int j, boolean isP1turn) {
+		SolitaryBoard newBoard = hardCopyForNextRound();
 		
 		//Take the space:
 		newBoard.P1Movable[i][j] = false;
 		newBoard.P2Movable[i][j] = false;
 
-		if(newBoard.P1turn) {
+		newBoard.numPieces++;
+		if(isP1turn) {
 			newBoard.table[i][j] = Constants.P1_COLOUR;
+			newBoard.numPiecesForPlayer1++;
 		} else {
 			newBoard.table[i][j] = Constants.P2_COLOUR;
 		}
-		newBoard.numPieces++;
 		
-		newBoard.updateMoveable(i, j);
-		
-		newBoard.P1turn = !newBoard.P1turn;
+		newBoard.updateMoveable(i, j, isP1turn);
 		
 		return newBoard;
 	}
 	
-	private void updateMoveable(int imove, int jmove) {
+	private void updateMoveable(int imove, int jmove, boolean isP1turn) {
 		
-		if(this.P1turn) {
-			for(int i=0; i<Constants.SIZE; i++) {
-				for(int j=0; j<Constants.SIZE; j++) {
+		if(isP1turn) {
+			for(int i=0; i<table.length; i++) {
+				for(int j=0; j<table.length; j++) {
 
 					if(table[i][j] != Constants.P2_COLOUR) {
 						int dy = i-imove;
 						int dx = j-jmove;
 						
 						
-						if(imove - dx >= 0         && imove - dx < Constants.SIZE
-								&& jmove + dy >= 0 && jmove + dy < Constants.SIZE
-								&& i - dx >= 0     && i - dx < Constants.SIZE
-								&& j + dy >= 0     && j + dy < Constants.SIZE) {
+						if(imove - dx >= 0         && imove - dx < table.length
+								&& jmove + dy >= 0 && jmove + dy < table.length
+								&& i - dx >= 0     && i - dx < table.length
+								&& j + dy >= 0     && j + dy < table.length) {
 							
 							if(table[imove - dx][jmove + dy] == Constants.P2_COLOUR
 									|| table[i - dx][j + dy] == Constants.P2_COLOUR) {
@@ -267,18 +265,18 @@ public class Board {
 		} else {
 			//Reflect for P2...
 			//Copy paste code that might be faster.
-			for(int i=0; i<Constants.SIZE; i++) {
-				for(int j=0; j<Constants.SIZE; j++) {
+			for(int i=0; i<table.length; i++) {
+				for(int j=0; j<table.length; j++) {
 
 					if(table[i][j] != Constants.P1_COLOUR) {
 						int dy = i-imove;
 						int dx = j-jmove;
 						
 						
-						if(imove - dx >= 0         && imove - dx < Constants.SIZE
-								&& jmove + dy >= 0 && jmove + dy < Constants.SIZE
-								&& i - dx >= 0     && i - dx < Constants.SIZE
-								&& j + dy >= 0     && j + dy < Constants.SIZE) {
+						if(imove - dx >= 0         && imove - dx < table.length
+								&& jmove + dy >= 0 && jmove + dy < table.length
+								&& i - dx >= 0     && i - dx < table.length
+								&& j + dy >= 0     && j + dy < table.length) {
 							
 							if(table[imove - dx][jmove + dy] == Constants.P1_COLOUR
 									|| table[i - dx][j + dy] == Constants.P1_COLOUR) {
@@ -320,23 +318,23 @@ public class Board {
 		
 	}
 	
-	public Board hardCopyForNextRound() {
+	public SolitaryBoard hardCopyForNextRound() {
 		
-		return new Board(this.table, this.P1Movable, this.P2Movable, this.P1turn, this.numPieces);
+		return new SolitaryBoard(this.table, this.P1Movable, this.P2Movable, this.numPieces, this.numPiecesForPlayer1);
 		
 	}
 	
 	//TODO: make getPlayableMoves that orders the list from most to least promissing
-	public int[] getPlayableMovesNaive() {
+	public int[] getPlayableMovesNaive(boolean isP1turn) {
 		int ret[];
 		
 		int curNumPlayable = 0;
 		
-		for(int i=0; i<Constants.SIZE; i++) {
-			for(int j=0; j<Constants.SIZE; j++) {
-				if(P1turn && P1Movable[i][j]) {
+		for(int i=0; i<table.length; i++) {
+			for(int j=0; j<table.length; j++) {
+				if(isP1turn && P1Movable[i][j]) {
 					curNumPlayable++;
-				} else if(P1turn == false && P2Movable[i][j]) {
+				} else if(isP1turn == false && P2Movable[i][j]) {
 					curNumPlayable++;
 				}
 			}
@@ -345,14 +343,14 @@ public class Board {
 		ret = new int[curNumPlayable];
 		curNumPlayable = 0;
 		
-		for(int i=0; i<Constants.SIZE; i++) {
-			for(int j=0; j<Constants.SIZE; j++) {
-				if(P1turn && P1Movable[i][j]) {
-					ret[curNumPlayable] = i * Constants.SIZE + j;
+		for(int i=0; i<table.length; i++) {
+			for(int j=0; j<table.length; j++) {
+				if(isP1turn && P1Movable[i][j]) {
+					ret[curNumPlayable] = i * table.length + j;
 					curNumPlayable++;
 					
-				} else if(P1turn == false && P2Movable[i][j]) {
-					ret[curNumPlayable] = i * Constants.SIZE + j;
+				} else if(isP1turn == false && P2Movable[i][j]) {
+					ret[curNumPlayable] = i * table.length + j;
 					curNumPlayable++;
 					
 				}
@@ -363,10 +361,10 @@ public class Board {
 	}
 	
 	
-	public boolean currentPlayerCantMove() {
-		if(this.P1turn) {
-			for(int i=0; i<Constants.SIZE; i++) {
-				for(int j=0; j<Constants.SIZE; j++) {
+	public boolean currentPlayerCantMove(boolean isP1turn) {
+		if(isP1turn) {
+			for(int i=0; i<table.length; i++) {
+				for(int j=0; j<table.length; j++) {
 					if(P1Movable[i][j]) {
 						return false;
 					}
@@ -376,8 +374,8 @@ public class Board {
 			
 			return true;
 		} else {
-			for(int i=0; i<Constants.SIZE; i++) {
-				for(int j=0; j<Constants.SIZE; j++) {
+			for(int i=0; i<table.length; i++) {
+				for(int j=0; j<table.length; j++) {
 					if(P2Movable[i][j]) {
 						return false;
 					}
@@ -390,10 +388,10 @@ public class Board {
 	}
 
 	//TODO: make less naive
-	public double naiveShallowEval() {
-		if(this.P1turn) {
-			for(int i=0; i<Constants.SIZE; i++) {
-				for(int j=0; j<Constants.SIZE; j++) {
+	public double naiveShallowEval(boolean isP1turn) {
+		if(isP1turn) {
+			for(int i=0; i<table.length; i++) {
+				for(int j=0; j<table.length; j++) {
 					if(P1Movable[i][j]) {
 						return 0.0;
 					}
@@ -403,8 +401,8 @@ public class Board {
 			
 			return -Double.MAX_VALUE;
 		} else {
-			for(int i=0; i<Constants.SIZE; i++) {
-				for(int j=0; j<Constants.SIZE; j++) {
+			for(int i=0; i<table.length; i++) {
+				for(int j=0; j<table.length; j++) {
 					if(P2Movable[i][j]) {
 						return 0.0;
 					}

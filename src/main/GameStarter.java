@@ -2,11 +2,15 @@ package main;
 
 import aiAlgo.AlphaBetaPrunePlayer;
 import aiAlgo.AlphaBetaPrunePlayerWithMemory;
+import aiAlgo.AlphaBetaPruneWithMemoryAndEval;
 import aiAlgo.MinMaxPlayer;
+import aiAlgoevaluator.BasicEval;
+import aiAlgoevaluator.BasicEvalWithFraction;
+import aiAlgoevaluator.halfwayEvalSUCKS;
 import consolePlayer.ConsolePlayer;
 import env.Board;
 import env.Constants;
-import player.Player;
+import player.PlayerI;
 
 public class GameStarter {
 
@@ -20,10 +24,27 @@ public class GameStarter {
 	//Player 1 concedes defeat!
 
 	public static void main(String[] args) {
-		Constants.SIZE = 5;
+		
+		//So far ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEval is the fastest
+		//ComputerAlphaBetaMemVsAlphaBetaMemAndFudgeFactorEval is just barely slower
+		
+		//TODO: actually solve MP MP
+		//TODO2: find the "prefered spaces" for 5x5 and maybe include that in eval.
+		
+		//TODO3: maybe having pegs that are aligned is bad?
+		
 		//ComputerHumanVsAlphaBeta();
 		//ComputerAlphaBetaVsAlphaBeta();
-		ComputerAlphaBetaMemVsAlphaBetaMem();
+		//ComputerAlphaBetaMemVsAlphaBetaMem();
+		
+		//Best so far:
+		ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEval();
+		
+		
+		//ComputerAlphaBetaVsAlphaBetaBothWithHalfWayEvalSucks();
+		//ComputerAlphaBetaMemVsAlphaBetaMemAndFudgeFactorEval();
+		//ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEvalMinSaveDepth();
+		
 	}
 	
 	public static void ComputerMinMaxVsHuman() {
@@ -56,7 +77,36 @@ public class GameStarter {
 		
 	}
 	
-	public static void PlayGame(Player p1, Player p2) {
+	public static void ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEval() {
+		System.out.println("Computer (alpha beta with memory and eval) vs Computer (alpha beta with memory and eval)");
+		PlayGame(new AlphaBetaPruneWithMemoryAndEval(new BasicEval()), new AlphaBetaPruneWithMemoryAndEval(new BasicEval()));
+		
+	}
+	
+//Sucks
+	public static void ComputerAlphaBetaVsAlphaBetaBothWithHalfWayEvalSucks() {
+		System.out.println("Computer (alpha beta with half-way eval) vs Computer (alpha beta with half-way eval)");
+		PlayGame(new AlphaBetaPruneWithMemoryAndEval(new halfwayEvalSUCKS()), new AlphaBetaPruneWithMemoryAndEval(new halfwayEvalSUCKS()));
+		
+	}
+	
+	//Not better than ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEval
+	public static void ComputerAlphaBetaMemVsAlphaBetaMemAndFudgeFactorEval() {
+		System.out.println("Computer (alpha beta with memory and fudge factor eval) vs Computer (alpha beta with memoryand fudge factor val)");
+		PlayGame(new AlphaBetaPruneWithMemoryAndEval(new BasicEvalWithFraction()), new AlphaBetaPruneWithMemoryAndEval(new BasicEvalWithFraction()));
+		
+	}
+	
+	//Sucks:
+	//Maybe make it MIN_PERM_SAVE DEPTH?
+	public static void ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEvalMinSaveDepth() {
+		System.out.println("Computer (alpha beta with memory and eval) vs Computer (alpha beta with memory and eval)");
+		int MIN_SAVE_DEPTH = 7;
+		PlayGame(new AlphaBetaPruneWithMemoryAndEval(new BasicEval(), MIN_SAVE_DEPTH), new AlphaBetaPruneWithMemoryAndEval(new BasicEval(), MIN_SAVE_DEPTH));
+		
+	}
+	
+	public static void PlayGame(PlayerI p1, PlayerI p2) {
 		
 		Board board = new Board();
 		

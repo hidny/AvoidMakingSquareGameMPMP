@@ -5,7 +5,7 @@ import java.util.Scanner;
 import env.Board;
 import env.Constants;
 
-public class ConsolePlayer implements player.Player {
+public class ConsolePlayer implements player.PlayerI {
 
 	public static Scanner in = new Scanner(System.in);
 	

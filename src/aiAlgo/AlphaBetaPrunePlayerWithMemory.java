@@ -7,12 +7,12 @@ import java.util.HashSet;
 import env.Board;
 import env.Constants;
 
-public class AlphaBetaPrunePlayerWithMemory implements player.Player {
+public class AlphaBetaPrunePlayerWithMemory implements player.PlayerI {
 	
 	//DEBUG
 	public static long numCallsToAlphaBeta = 0;
 
-	public static int DEBUG_K = 8;
+	public static int DEBUG_K = 6;
 	public static long numCallsToAlphaBetaKMovesIn[] = new long[DEBUG_K + 1];
 	//END DEBUG
 	
@@ -94,8 +94,8 @@ public class AlphaBetaPrunePlayerWithMemory implements player.Player {
 		//DEBUG
 		numCallsToAlphaBeta++;
 		
-		if(depth >= Constants.SIZE * Constants.SIZE - DEBUG_K) {
-			int tmpDebugMovesIn =  (Constants.SIZE * Constants.SIZE - depth);
+		if(depth >= Constants.NUM_CELLS - DEBUG_K) {
+			int tmpDebugMovesIn =  (Constants.NUM_CELLS - depth);
 			numCallsToAlphaBetaKMovesIn[tmpDebugMovesIn]++;
 			System.out.println("Num calls to AlphaBetaMem while " + tmpDebugMovesIn + " Moves in: " + numCallsToAlphaBetaKMovesIn[tmpDebugMovesIn]);
 		}
@@ -199,6 +199,7 @@ public class AlphaBetaPrunePlayerWithMemory implements player.Player {
 		}
 		
 		if(numElementsRecorded > maxNumElements) {
+			System.out.println("DEBUG: MEMORY REFRESH");
 			records.clear();
 			numElementsRecorded = 0;
 		}

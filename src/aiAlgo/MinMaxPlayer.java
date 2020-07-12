@@ -2,7 +2,7 @@ package aiAlgo;
 
 import env.Board;
 
-public class MinMaxPlayer implements player.Player {
+public class MinMaxPlayer implements player.PlayerI {
 
 	public static long numCallsToMinMax = 0;
 	
