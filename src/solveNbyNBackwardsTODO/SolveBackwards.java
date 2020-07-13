@@ -6,87 +6,91 @@ import java.util.Scanner;
 
 import env.Constants;
 import solveMPMP.SolitaryBoard;
+import solveUtil.SolveUtilFunctions;
 
-//TODO:
+//TODO: need to debug!!!
 public class SolveBackwards {
 
 	
-	public static int N = 5;
+	public static int N = 4;
 	public static int NUM_CELLS = N * N;
+	public static boolean FIND_PLAYER1_LOSSES = true;
 
+	// N= 5
+	// solveLosingPositions(23, true);
+	//No solution!
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-	}
-	
-	
-	
-	public static int[] initOrderToSolve() {
 		
-		int currentOrder[] = new int[NUM_CELLS];
-		for(int i=0; i<NUM_CELLS; i++) {
-			currentOrder[i] = i;
-		}
+		System.out.println("Start");
 		
-		int numSqaresWithCellInCorner[] = new int[NUM_CELLS];
+		//solveLosingPositions(NUM_CELLS - 2, true);
 		
-		for(int i=0; i<NUM_CELLS; i++) {
-			numSqaresWithCellInCorner[i] = getNumSqaresCellCouldParticipateIn(i);
-			System.out.println(numSqaresWithCellInCorner[i]);
+		int emptySpaces;
+		
+		boolean searchPosWhereOddNumSpacesLeft = false;
+		
+		if((FIND_PLAYER1_LOSSES == true && N%2 == 1) ||
+				(FIND_PLAYER1_LOSSES == false && N%2 == 0)) {
+			searchPosWhereOddNumSpacesLeft = true;
 		}
 		
 		
-		for(int i=0; i<NUM_CELLS; i++) {
-			int bestIndex = i;
-			for(int j=i+1; j<NUM_CELLS; j++) {
-				
-				if(numSqaresWithCellInCorner[j] > numSqaresWithCellInCorner[bestIndex]) {
-					bestIndex = j;
-				}
+		for(int i=0; 2*i <=NUM_CELLS; i++) {
+			
+			
+			if(searchPosWhereOddNumSpacesLeft) {
+				emptySpaces = 2*i + 1;
+			} else {
+				emptySpaces = 2*i;
 			}
 			
-			int tmp = numSqaresWithCellInCorner[i];
-			numSqaresWithCellInCorner[i] = numSqaresWithCellInCorner[bestIndex];
-			numSqaresWithCellInCorner[bestIndex] = tmp;
 			
-			int tmpOrder = currentOrder[i];
-			currentOrder[i] = currentOrder[bestIndex];
-			currentOrder[bestIndex] = tmpOrder;
+			System.out.println("Solve Losing positions with " + emptySpaces + " empty spaces left:");
+			solvePositionsWhereNextMoveLoses(NUM_CELLS - emptySpaces, true);
 		}
 		
-		return currentOrder;
-	}
-	
-	public static int getNumSqaresCellCouldParticipateIn(int code) {
+		if(FIND_PLAYER1_LOSSES == true) {
+			System.out.println("num player 1 losing solutions: " + numSolutions);
+		} else {
+			System.out.println("num player 2 losing solutions: " + numSolutions);
+		}
 		
-		//i cell
-		//j cell
-		int icell = code / N;
-		int jcell = code % N;
+		if(searchPosWhereOddNumSpacesLeft == true) {
+			System.out.println("Searched where there were an ODD number of empty cells left in the position");
+		} else {
+			System.out.println("Searched where there were an EVEN number of empty cells left in the position");
+		}
 		
-		int ret = 0;
+		//N=4:
+		//num player 1 losing solutions: 9988
+		//Searched where there were an EVEN number of empty cells left in the position
+		//num player 2 losing solutions: 6621
+		//Searched where there were an ODD number of empty cells left in the position
 		
-		for(int i=0; i<N; i++) {
-			for(int j=0; j<N; j++) {
-
-					int dy = i-icell;
-					int dx = j-jcell;
-					
-					
-					if(icell - dx >= 0         && icell - dx < N
-							&& jcell + dy >= 0 && jcell + dy < N
-							&& i - dx >= 0     && i - dx < N
-							&& j + dy >= 0     && j + dy < N) {
-						
-						ret++;
-						
-					}// END IF could make square
-					
-			}// END inner for loop
+		//N = 5:
+		//P1 loss positions: 117412
+		//P2 loss positions: 139405
 		
-		}//END outer for loop
+		//N=6:
+		//num solutions: 596309 if emptySpaces = 2*i + 1;
+		//num solutions: 639298 if emptySpaces = 2*i
 		
-		return ret;
+		//N=7 (note: N=7 has NO ties!)
+		//num player 1 losing solutions: 789999
+		//Searched where there were an ODD number of empty cells left in the position
+		//num player 2 losing solutions: 819716
+		//Searched where there were an EVEN number of empty cells left in the position
+		//TODO: figure out 
+		
+		
+		//N=8:
+		//num player 1 losing solutions: 1819922
+		//Searched where there were an EVEN number of empty cells left in the position
+		//num player 2 losing solutions: 1778595
+		//Searched where there were an ODD number of empty cells left in the position
+		
 	}
 	
 	public static Scanner in = new Scanner(System.in);
@@ -148,119 +152,135 @@ public class SolveBackwards {
 	
 	//Recursive function to get
 	//Get all losing positions for player 2
-	public static ArrayList<BigInteger> solveLosingPositions(int size, int numPegsOnBoard, boolean tieIsAsGoodAsLoss) {
+	public static ArrayList<BigInteger> solvePositionsWhereNextMoveLoses(int numPegsOnBoard, boolean tieIsAsGoodAsLoss) {
 		
-		//If size * size - numPegsOnBoard > 2:
+		//TODO: If size * size - numPegsOnBoard > 2:
 		// Will need to call: solveLosingPositions(size, numPegsOnBoard - 2, tieIsAsGoodAsLoss)
-		return null;
-	}
-	
-	
-	
-	public static ArrayList<BigInteger> solve(SolitaryBoard current, int orderToSolve[]) {
 		
-		//If solved: stop and show
-
-		int table[][] = current.getTable();
-		boolean emptySpots[][] = new boolean[table.length][table.length];
-
-		boolean curSolved = true;
+		SolitaryBoard board = new SolitaryBoard(N);
 		
-		for(int i=0; i<table.length; i++) {
-			for(int j=0; j<table[i].length; j++) {
-				if(table[i][j] == Constants.EMPTY) {
-					emptySpots[i][j] = true;
-					curSolved = false;
+		int orderToSolve[] = SolveUtilFunctions.initOrderToSolve(NUM_CELLS); 
+		
+		System.out.println("Printing order to solve:");
+		for(int i=0; i<N; i++) {
+			for(int j=0; j<N; j++) {
+				
+				for(int k=0; k<NUM_CELLS; k++) {
+					if(orderToSolve[k] == N*i + j) {
+						System.out.print(k + ("     ".substring((k + "").length()))   );
+					}
 				}
 			}
-		}
-		
-		if(curSolved) {
-			System.out.println("Found a solution!");
-			numSolutions++;
-			System.out.println("Solution #" + numSolutions);
-			current.draw();
 			System.out.println();
-			
-			return null;
-			//in.nextLine();
 		}
 		
-		//End if solved
-
-		//Get next location to insert
-		int nextI = -1;
-		int nextJ = -1;
 		
-		for(int k=0; k<orderToSolve.length; k++) {
-			int i = orderToSolve[k] / table.length;
-			int j = orderToSolve[k] % table.length;
+		//TODO: not whole story yet...
+		return solveLosingPositions1MoveAway(board, orderToSolve, 0, numPegsOnBoard, tieIsAsGoodAsLoss);
+	}
+	
+	public static ArrayList<BigInteger> solveLosingPositions1MoveAway(SolitaryBoard current, int orderToSolve[], int numSpacesSkipped, int numPegsOnBoard, boolean tieIsAsGoodAsLoss) {
+		
+		
+		//Check for valid solution
+
+
+		int numP1PiecesNeeded = numP1PiecesNeeded(numPegsOnBoard);
+		int numP2PiecesNeeded = numP2PiecesNeeded(numPegsOnBoard);
+		
+		int numSpaceNeeded = NUM_CELLS - numPegsOnBoard;
+		
+		if( (current.getNumPiecesForPlayer1() == numP1PiecesNeeded)
+			&& current.getNumPiecesForPlayer2() == numP2PiecesNeeded) {
 			
-			if(emptySpots[i][j]) {
-				nextI = i;
-				nextJ = j;
+			double eval = current.naiveShallowEval(isPlayer1Turn(current) == true);
+			
+			if( (isPlayer1Turn(current) == true && eval < 0.0)
+				|| (isPlayer1Turn(current) == false && eval > 0.0)) {
+				System.out.println("Found solution.");
+				
+				current.draw();
+				System.out.println("TODO: record and check if it's an insta loss...");
 			}
-		}
-		//End get next empty spot
-		
-		
-		//Get num pieces left to add:
-		int PIECE_NEEDED_P1 = -1;
-		int PIECE_NEEDED_P2 = -1;
-		
-		if(orderToSolve.length % 2 == 0) {
-			PIECE_NEEDED_P1 = orderToSolve.length / 2;
-			PIECE_NEEDED_P2 = orderToSolve.length / 2;
-		} else {
-			PIECE_NEEDED_P1 = (orderToSolve.length + 1) / 2;
-			PIECE_NEEDED_P2 = (orderToSolve.length - 1) / 2;
+			
 			
 		}
-		//End get num pieces left to add
-
 		
-		//Try playing a move for P1: (TODO: try no limit)
-		if(current.getNumPiecesForPlayer1() < PIECE_NEEDED_P1) {
+		int coord[] = SolveUtilFunctions.getNextCellToConsider(SolveUtilFunctions.getEmptyCells(current), orderToSolve, numSpacesSkipped);
+		int nextI = coord[0];
+		int nextJ = coord[1];
 		
+		
+		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();
+		
+		//Try to insert P1 peg
+		if(current.getNumPiecesForPlayer1() < numP1PiecesNeeded) {
+			
 			//try insert P1
 			SolitaryBoard tmpBoard = current.moveNullOnLoss(nextI, nextJ, P1TURN);
 			
 			if(tmpBoard != null) {
-				//And insert all implied pegs
-				//SolitaryBoard nextPosToAnalyze = insertAllImpliedPegsForATie(tmpBoard);
 				
-				//if(nextPosToAnalyze != null) {
-				//	return solve(nextPosToAnalyze, orderToSolve);
-				//}
+				//TODO: this function doesn't work, but you could at least try to notice when too many cells need to be skipped...
+				//And insert all implied pegs
+				//SolitaryBoard nextPosToAnalyze = SolveUtilFunctions.insertAllImpliedPegsForNotDoneGame(tmpBoard, numP1PiecesNeeded, numP2PiecesNeeded, numSpaceNeeded);
+				//END TODO
+				
+				ret.addAll(solveLosingPositions1MoveAway(tmpBoard, orderToSolve, numSpacesSkipped, numPegsOnBoard, tieIsAsGoodAsLoss));
+				
+				numSolutions++;
 			}
 			//solve for next pos
+			
 		}
+		//End try to insert P1 peg
 		
 		
-		//Try playing a move for P2 instead:(TODO: try no limit)
-		if( current.getNumPiecesForPlayer2() < PIECE_NEEDED_P2) {
+
+		//Try to insert P2 peg
+		if(current.getNumPiecesForPlayer2() < numP2PiecesNeeded) {
 			
 			//try insert P2
-			SolitaryBoard tmpBoard2 = current.moveNullOnLoss(nextI, nextJ, P2TURN);
+			SolitaryBoard tmpBoard = current.moveNullOnLoss(nextI, nextJ, P2TURN);
 			
-			if(tmpBoard2 != null) {
+			if(tmpBoard != null) {
 				//And insert all implied pegs
 				
-				//SolitaryBoard nextPosToAnalyze = insertAllImpliedPegsForATie(tmpBoard2);
+				//TODO: see above and create function to filter out pos with too many empty spots (numSpacesSkipped + other forced empty spots we will eventually hit) 
 				
-				//if(nextPosToAnalyze != null) {
-				//	return solve(nextPosToAnalyze, orderToSolve);
-				//}
-				
+				ret.addAll(solveLosingPositions1MoveAway(tmpBoard, orderToSolve, numSpacesSkipped, numPegsOnBoard, tieIsAsGoodAsLoss));
+			
 			}
 			//solve for next pos
-		
+			
 		}
-		//Done.
+		//END try to insert P2 peg
 		
-		return null;
+		//Try to insert space
+		if(numSpacesSkipped + 1 <= numSpacesSkipped) {
+			ret.addAll(solveLosingPositions1MoveAway(current, orderToSolve, numSpacesSkipped + 1, numPegsOnBoard, tieIsAsGoodAsLoss));
+		}
+		//Done
 		
+		return ret;
 	}
 	
-
+	
+	public static int numP1PiecesNeeded(int numPegsOnBoard) {
+		return numPegsOnBoard - numP2PiecesNeeded(numPegsOnBoard);
+	}
+	
+	public static int numP2PiecesNeeded(int numPegsOnBoard) {
+		return numPegsOnBoard/2;
+	}
+	
+	//If num pieces is even, lets say it's player1's turn
+	public static boolean isPlayer1Turn(SolitaryBoard board) {
+		if(board.getNumPieces() % 2 == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 }

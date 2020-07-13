@@ -3,13 +3,13 @@ package solveMPMP;
 import java.util.Scanner;
 
 import env.Constants;
+import solveUtil.SolveUtilFunctions;
 
 public class Solve {
 
 	
-	public static int N = 5;
+	public static int N = 7;
 
-	//TODO
 	public static boolean NO_LIMIT_PEGS_OF_ONE_COLOUR = false;
 
 	public static int NUM_CELLS = N*N;
@@ -38,11 +38,10 @@ public class Solve {
 	
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 
 		SolitaryBoard board = new SolitaryBoard(N);
 		
-		int orderToSolve[] = initOrderToSolve(); 
+		int orderToSolve[] = SolveUtilFunctions.initOrderToSolve(NUM_CELLS); 
 		
 		for(int i=0; i<N; i++) {
 			for(int j=0; j<N; j++) {
@@ -71,82 +70,13 @@ public class Solve {
 		
 	}
 	
-	public static int[] initOrderToSolve() {
-		
-		int currentOrder[] = new int[NUM_CELLS];
-		for(int i=0; i<NUM_CELLS; i++) {
-			currentOrder[i] = i;
-		}
-		
-		int numSqaresWithCellInCorner[] = new int[NUM_CELLS];
-		
-		for(int i=0; i<NUM_CELLS; i++) {
-			numSqaresWithCellInCorner[i] = getNumSqaresCellCouldParticipateIn(i);
-			System.out.println(numSqaresWithCellInCorner[i]);
-		}
-		
-		
-		for(int i=0; i<NUM_CELLS; i++) {
-			int bestIndex = i;
-			for(int j=i+1; j<NUM_CELLS; j++) {
-				
-				if(numSqaresWithCellInCorner[j] > numSqaresWithCellInCorner[bestIndex]) {
-					bestIndex = j;
-				}
-			}
-			
-			int tmp = numSqaresWithCellInCorner[i];
-			numSqaresWithCellInCorner[i] = numSqaresWithCellInCorner[bestIndex];
-			numSqaresWithCellInCorner[bestIndex] = tmp;
-			
-			int tmpOrder = currentOrder[i];
-			currentOrder[i] = currentOrder[bestIndex];
-			currentOrder[bestIndex] = tmpOrder;
-		}
-		
-		return currentOrder;
-	}
 	
-	public static int getNumSqaresCellCouldParticipateIn(int code) {
-		
-		//i cell
-		//j cell
-		int icell = code / N;
-		int jcell = code % N;
-		
-		int ret = 0;
-		
-		for(int i=0; i<N; i++) {
-			for(int j=0; j<N; j++) {
-
-					int dy = i-icell;
-					int dx = j-jcell;
-					
-					
-					if(icell - dx >= 0         && icell - dx < N
-							&& jcell + dy >= 0 && jcell + dy < N
-							&& i - dx >= 0     && i - dx < N
-							&& j + dy >= 0     && j + dy < N) {
-						
-						ret++;
-						
-					}// END IF could make square
-					
-			}// END inner for loop
-		
-		}//END outer for loop
-		
-		return ret;
-	}
 	
 	public static Scanner in = new Scanner(System.in);
 	
 	public static int numSolutions = 0;
 	
 
-	public static boolean P1TURN = true;
-	public static boolean P2TURN = false;
-	
 	
 	public static void solve(SolitaryBoard current, int orderToSolve[]) {
 		
@@ -206,23 +136,21 @@ public class Solve {
 			if(emptySpots[i][j]) {
 				nextI = i;
 				nextJ = j;
+				break;
 			}
 		}
 		//End get next empty spot
 		
 		
-		
-
-		
 		//Try playing a move for P1:
 		if(NO_LIMIT_PEGS_OF_ONE_COLOUR || current.getNumPiecesForPlayer1() < PIECE_NEEDED_P1) {
 		
 			//try insert P1
-			SolitaryBoard tmpBoard = current.moveNullOnLoss(nextI, nextJ, P1TURN);
+			SolitaryBoard tmpBoard = current.moveNullOnLoss(nextI, nextJ, SolveUtilFunctions.P1TURN);
 			
 			if(tmpBoard != null) {
 				//And insert all implied pegs
-				SolitaryBoard nextPosToAnalyze = insertAllImpliedPegsForATie(tmpBoard);
+				SolitaryBoard nextPosToAnalyze = SolveUtilFunctions.insertAllImpliedPegsForTieGame(tmpBoard);
 				
 				if(nextPosToAnalyze != null) {
 					solve(nextPosToAnalyze, orderToSolve);
@@ -236,12 +164,12 @@ public class Solve {
 		if(NO_LIMIT_PEGS_OF_ONE_COLOUR || current.getNumPiecesForPlayer2() < PIECE_NEEDED_P2) {
 			
 			//try insert P2
-			SolitaryBoard tmpBoard2 = current.moveNullOnLoss(nextI, nextJ, P2TURN);
+			SolitaryBoard tmpBoard2 = current.moveNullOnLoss(nextI, nextJ, SolveUtilFunctions.P2TURN);
 			
 			if(tmpBoard2 != null) {
 				//And insert all implied pegs
 				
-				SolitaryBoard nextPosToAnalyze = insertAllImpliedPegsForATie(tmpBoard2);
+				SolitaryBoard nextPosToAnalyze = SolveUtilFunctions.insertAllImpliedPegsForTieGame(tmpBoard2);
 				
 				if(nextPosToAnalyze != null) {
 					solve(nextPosToAnalyze, orderToSolve);
@@ -256,60 +184,4 @@ public class Solve {
 		
 	}
 	
-	//mutates input
-	public static SolitaryBoard insertAllImpliedPegsForATie(SolitaryBoard current) {
-		
-		int table[][] = current.getTable();
-		boolean p1Movable[][] = current.getP1Movable();
-		boolean p2Movable[][] = current.getP2Movable();
-		
-		boolean tryAgain = true;
-		boolean reinitBecausePegWasInserted = false;
-		
-		while(tryAgain == true) {
-			tryAgain = false;
-			
-			for(int i=0; i<table.length; i++) {
-				for(int j=0; j<table[i].length; j++) {
-					
-					if(table[i][j] == Constants.EMPTY) {
-						
-						if(p1Movable[i][j] == false && p2Movable[i][j] == false) {
-							return null;
-						
-						} else if(p1Movable[i][j] && p2Movable[i][j] == false) {
-							current = current.moveNullOnLoss(i, j, P1TURN);
-							
-							
-							tryAgain = true;
-							reinitBecausePegWasInserted = true;
-							
-						} else if(p1Movable[i][j] == false && p2Movable[i][j]) {
-							current = current.moveNullOnLoss(i, j, P2TURN);
-							tryAgain = true;
-							reinitBecausePegWasInserted = true;
-							
-						}
-						
-						if(reinitBecausePegWasInserted) {
-							
-							if(current == null) {
-								return null;
-							}
-							
-							table= current.getTable();
-							p1Movable = current.getP1Movable();
-							p2Movable = current.getP2Movable();
-							
-							reinitBecausePegWasInserted = false;
-						}
-					}
-					
-				}
-			}
-		}
-		
-		return current;
-	}
-
 }
