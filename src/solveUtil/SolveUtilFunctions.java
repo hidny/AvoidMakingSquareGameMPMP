@@ -129,14 +129,9 @@ public class SolveUtilFunctions {
 	
 	public static int NO_LIMIT = -1;
 
-	//mutates input
-	public static SolitaryBoard insertAllImpliedPegsForTieGame(SolitaryBoard current) {
-		return insertAllImpliedPegsForNotDoneGame(current, NO_LIMIT, NO_LIMIT, 0);
-		
-	}
-	//TODO: make it immutable!
-	public static SolitaryBoard insertAllImpliedPegsForNotDoneGame(SolitaryBoard current, int limitP1Pegs, int limitP2Pegs, int limitBlankPegs) {
-		
+
+	public static SolitaryBoard insertAllImpliedPegsForTieGame(SolitaryBoard current, boolean noLimitPegsOfOneColour) {
+
 		int table[][] = current.getTable();
 		boolean p1Movable[][] = current.getP1Movable();
 		boolean p2Movable[][] = current.getP2Movable();
@@ -146,8 +141,9 @@ public class SolveUtilFunctions {
 		
 		int curNumP1Pegs = current.getNumPiecesForPlayer1();
 		int curNumP2Pegs = current.getNumPiecesForPlayer2();
-		int curNumDemilitarizedZone = 0;
 		
+		int limitP1Pegs = numP1PiecesNeededForTie(table);
+		int limitP2Pegs = numP2PiecesNeededForTie(table);
 		
 		while(tryAgain == true) {
 			tryAgain = false;
@@ -160,16 +156,14 @@ public class SolveUtilFunctions {
 						if(p1Movable[i][j] == false && 
 								p2Movable[i][j] == false) {
 
-							curNumDemilitarizedZone++;
-							if(limitBlankPegs != NO_LIMIT && curNumDemilitarizedZone > limitBlankPegs) {
-								return null;
-							}
+							return null;
+							
 						
 						} else if(p1Movable[i][j] && 
 								p2Movable[i][j] == false) {
 							
 							curNumP1Pegs++;
-							if(limitP1Pegs != NO_LIMIT && curNumP1Pegs > limitP1Pegs) {
+							if(noLimitPegsOfOneColour == false && curNumP1Pegs > limitP1Pegs) {
 								return null;
 							}
 							
@@ -181,7 +175,7 @@ public class SolveUtilFunctions {
 						} else if(p1Movable[i][j] == false && p2Movable[i][j]) {
 	
 							curNumP2Pegs++;
-							if(limitP2Pegs != NO_LIMIT && curNumP2Pegs > limitP2Pegs) {
+							if(noLimitPegsOfOneColour == false && curNumP2Pegs > limitP2Pegs) {
 								return null;
 							}
 							
@@ -211,6 +205,33 @@ public class SolveUtilFunctions {
 		
 		return current;
 	}
+	
+	
+	
+	
+	//TODO: seperate out part to solve MPMP
+	
+	//TODO: make it immutable!
+	public static SolitaryBoard insertAllImpliedPegsForNotDoneGame(SolitaryBoard current, int limitP1Pegs, int limitP2Pegs, int limitBlankPegs, int orderToSolve[], int numSpotsUsed) {
 
+		return null;
+	}
+
+
+	public static int numP1PiecesNeededForTie(int table[][]) {
+		return numP1PiecesNeeded(table.length * table.length);
+	}
+	
+	public static int numP2PiecesNeededForTie(int table[][]) {
+		return numP2PiecesNeeded(table.length * table.length);
+	}
+	
+	public static int numP1PiecesNeeded(int numPegsOnBoard) {
+		return numPegsOnBoard - numP2PiecesNeeded(numPegsOnBoard);
+	}
+	
+	public static int numP2PiecesNeeded(int numPegsOnBoard) {
+		return numPegsOnBoard/2;
+	}
 	
 }

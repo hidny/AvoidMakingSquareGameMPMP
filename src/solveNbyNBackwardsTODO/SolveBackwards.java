@@ -13,7 +13,7 @@ public class SolveBackwards {
 
 	
 	//There's a bug with N=8... :(
-	public static int N = 5;
+	public static int N = 4;
 	public static int NUM_CELLS = N * N;
 	public static boolean FIND_PLAYER1_LOSSES = false;
 
@@ -164,8 +164,8 @@ public class SolveBackwards {
 		//Check for valid solution
 
 
-		int numP1PiecesNeeded = numP1PiecesNeeded(numPegsOnBoard);
-		int numP2PiecesNeeded = numP2PiecesNeeded(numPegsOnBoard);
+		int numP1PiecesNeeded = SolveUtilFunctions.numP1PiecesNeeded(numPegsOnBoard);
+		int numP2PiecesNeeded = SolveUtilFunctions.numP2PiecesNeeded(numPegsOnBoard);
 		
 		int numSpaceNeeded = NUM_CELLS - numPegsOnBoard;
 		
@@ -264,14 +264,7 @@ public class SolveBackwards {
 		return ret;
 	}
 	
-	
-	public static int numP1PiecesNeeded(int numPegsOnBoard) {
-		return numPegsOnBoard - numP2PiecesNeeded(numPegsOnBoard);
-	}
-	
-	public static int numP2PiecesNeeded(int numPegsOnBoard) {
-		return numPegsOnBoard/2;
-	}
+
 	
 	//If num pieces is even, lets say it's player1's turn
 	public static boolean isPlayer1Turn(SolitaryBoard board) {

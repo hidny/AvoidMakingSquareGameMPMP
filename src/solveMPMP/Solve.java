@@ -10,12 +10,12 @@ public class Solve {
 	
 	public static int N = 7;
 
-	public static boolean NO_LIMIT_PEGS_OF_ONE_COLOUR = false;
+	public static boolean NO_LIMIT_PEGS_OF_ONE_COLOUR = true;
 
 	public static int NUM_CELLS = N*N;
 	
 	//RIGHT ANSWER:
-	//1: 2
+	//1: 1
 	//2: 6
 	//3: 92
 	//4: 2094
@@ -150,7 +150,7 @@ public class Solve {
 			
 			if(tmpBoard != null) {
 				//And insert all implied pegs
-				SolitaryBoard nextPosToAnalyze = SolveUtilFunctions.insertAllImpliedPegsForTieGame(tmpBoard);
+				SolitaryBoard nextPosToAnalyze = SolveUtilFunctions.insertAllImpliedPegsForTieGame(tmpBoard, NO_LIMIT_PEGS_OF_ONE_COLOUR);
 				
 				if(nextPosToAnalyze != null) {
 					solve(nextPosToAnalyze, orderToSolve);
@@ -169,7 +169,7 @@ public class Solve {
 			if(tmpBoard2 != null) {
 				//And insert all implied pegs
 				
-				SolitaryBoard nextPosToAnalyze = SolveUtilFunctions.insertAllImpliedPegsForTieGame(tmpBoard2);
+				SolitaryBoard nextPosToAnalyze = SolveUtilFunctions.insertAllImpliedPegsForTieGame(tmpBoard2, NO_LIMIT_PEGS_OF_ONE_COLOUR);
 				
 				if(nextPosToAnalyze != null) {
 					solve(nextPosToAnalyze, orderToSolve);
