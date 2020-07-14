@@ -12,20 +12,21 @@ import solveUtil.SolveUtilFunctions;
 public class SolveBackwards {
 
 	
-	public static int N = 4;
+	//There's a bug with N=8... :(
+	public static int N = 5;
 	public static int NUM_CELLS = N * N;
-	public static boolean FIND_PLAYER1_LOSSES = true;
+	public static boolean FIND_PLAYER1_LOSSES = false;
 
+	//num player 1 losing/tying solutions for a 4x4 board: 29340
+	//num player 2 losing/tying solutions for a 4x4 board: 16932
+	
 	// N= 5
 	// solveLosingPositions(23, true);
 	//No solution!
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		
 		System.out.println("Start");
-		
-		//solveLosingPositions(NUM_CELLS - 2, true);
 		
 		int emptySpaces;
 		
@@ -36,25 +37,31 @@ public class SolveBackwards {
 			searchPosWhereOddNumSpacesLeft = true;
 		}
 		
+		//Find ties:
+		solveForTiedFinalPositions();
 		
-		for(int i=0; 2*i <=NUM_CELLS; i++) {
-			
+		//TODO: translate ties into losing positions 1-2 moves back.
+		
+		//Find loses
+		for(int i=1; 2*i <=NUM_CELLS; i++) {
 			
 			if(searchPosWhereOddNumSpacesLeft) {
-				emptySpaces = 2*i + 1;
+				emptySpaces = 2*i - 1;
 			} else {
 				emptySpaces = 2*i;
 			}
 			
 			
-			System.out.println("Solve Losing positions with " + emptySpaces + " empty spaces left:");
+			System.out.println("Solve Losing positions (or tying) with " + emptySpaces + " empty spaces left:");
 			solvePositionsWhereNextMoveLoses(NUM_CELLS - emptySpaces, true);
+			
+			//TODO: translate lossing positions into losing positions 2 moves back, unless were at the very start.
 		}
 		
 		if(FIND_PLAYER1_LOSSES == true) {
-			System.out.println("num player 1 losing solutions: " + numSolutions);
+			System.out.println("num player 1 losing/tying solutions for a " + N + "x" + N + " board: " + numSolutions);
 		} else {
-			System.out.println("num player 2 losing solutions: " + numSolutions);
+			System.out.println("num player 2 losing/tying solutions for a " + N + "x" + N + " board: " + numSolutions);
 		}
 		
 		if(searchPosWhereOddNumSpacesLeft == true) {
@@ -63,33 +70,6 @@ public class SolveBackwards {
 			System.out.println("Searched where there were an EVEN number of empty cells left in the position");
 		}
 		
-		//N=4:
-		//num player 1 losing solutions: 9988
-		//Searched where there were an EVEN number of empty cells left in the position
-		//num player 2 losing solutions: 6621
-		//Searched where there were an ODD number of empty cells left in the position
-		
-		//N = 5:
-		//P1 loss positions: 117412
-		//P2 loss positions: 139405
-		
-		//N=6:
-		//num solutions: 596309 if emptySpaces = 2*i + 1;
-		//num solutions: 639298 if emptySpaces = 2*i
-		
-		//N=7 (note: N=7 has NO ties!)
-		//num player 1 losing solutions: 789999
-		//Searched where there were an ODD number of empty cells left in the position
-		//num player 2 losing solutions: 819716
-		//Searched where there were an EVEN number of empty cells left in the position
-		//TODO: figure out 
-		
-		
-		//N=8:
-		//num player 1 losing solutions: 1819922
-		//Searched where there were an EVEN number of empty cells left in the position
-		//num player 2 losing solutions: 1778595
-		//Searched where there were an ODD number of empty cells left in the position
 		
 	}
 	
@@ -148,14 +128,14 @@ public class SolveBackwards {
 	
 	//TODO: start with 4x4 case because it can be completely checked against AlphaBetaPrunPlayer
 	
-	//TODO: OR: start with 23 pegs case
+	public static ArrayList<BigInteger> solveForTiedFinalPositions() {
+		return solvePositionsWhereNextMoveLoses(NUM_CELLS, true);
+	}
+	
 	
 	//Recursive function to get
 	//Get all losing positions for player 2
 	public static ArrayList<BigInteger> solvePositionsWhereNextMoveLoses(int numPegsOnBoard, boolean tieIsAsGoodAsLoss) {
-		
-		//TODO: If size * size - numPegsOnBoard > 2:
-		// Will need to call: solveLosingPositions(size, numPegsOnBoard - 2, tieIsAsGoodAsLoss)
 		
 		SolitaryBoard board = new SolitaryBoard(N);
 		
@@ -175,7 +155,6 @@ public class SolveBackwards {
 		}
 		
 		
-		//TODO: not whole story yet...
 		return solveLosingPositions1MoveAway(board, orderToSolve, 0, numPegsOnBoard, tieIsAsGoodAsLoss);
 	}
 	
@@ -197,10 +176,32 @@ public class SolveBackwards {
 			
 			if( (isPlayer1Turn(current) == true && eval < 0.0)
 				|| (isPlayer1Turn(current) == false && eval > 0.0)) {
-				System.out.println("Found solution.");
+				/*System.out.println("Found solution.");
+				if(isPlayer1Turn(current)) {
+					System.out.println("Player 1's turn");
+				} else {
+					System.out.println("Player 2's turn");
+				}
 				
 				current.draw();
 				System.out.println("TODO: record and check if it's an insta loss...");
+				*/
+
+				numSolutions++;
+			} else if(tieIsAsGoodAsLoss && numSpaceNeeded == 0) {
+				//It's a tie
+				/*System.out.println("Found a Solution that's a Tie!");
+				if(isPlayer1Turn(current)) {
+					System.out.println("Player 1's turn");
+				} else {
+					System.out.println("Player 2's turn");
+				}
+				
+				current.draw();
+				System.out.println("TODO: record and check if it's an insta loss...");
+				*/
+
+				numSolutions++;
 			}
 			
 			
@@ -224,11 +225,9 @@ public class SolveBackwards {
 				//TODO: this function doesn't work, but you could at least try to notice when too many cells need to be skipped...
 				//And insert all implied pegs
 				//SolitaryBoard nextPosToAnalyze = SolveUtilFunctions.insertAllImpliedPegsForNotDoneGame(tmpBoard, numP1PiecesNeeded, numP2PiecesNeeded, numSpaceNeeded);
-				//END TODO
 				
 				ret.addAll(solveLosingPositions1MoveAway(tmpBoard, orderToSolve, numSpacesSkipped, numPegsOnBoard, tieIsAsGoodAsLoss));
 				
-				numSolutions++;
 			}
 			//solve for next pos
 			
@@ -257,7 +256,7 @@ public class SolveBackwards {
 		//END try to insert P2 peg
 		
 		//Try to insert space
-		if(numSpacesSkipped + 1 <= numSpacesSkipped) {
+		if(numSpacesSkipped + 1 <= numSpaceNeeded) {
 			ret.addAll(solveLosingPositions1MoveAway(current, orderToSolve, numSpacesSkipped + 1, numPegsOnBoard, tieIsAsGoodAsLoss));
 		}
 		//Done
