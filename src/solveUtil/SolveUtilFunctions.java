@@ -122,6 +122,37 @@ public class SolveUtilFunctions {
 		
 		return new int[] { nextI, nextJ };
 	}
+	
+	public static int getIndexNextCellToConsider(boolean emptyCells[][], int orderToSolve[]) {
+		return getIndexNextCellToConsider(emptyCells, orderToSolve, 0);
+	}
+	public static int getIndexNextCellToConsider(boolean emptyCells[][], int orderToSolve[], int numEmptyCellsToSkip) {	
+		int nextI = -1;
+		int nextJ = -1;
+		
+		int numEmptyCellsSkipped = 0;
+		
+		int ret=0;
+		for(; ret<orderToSolve.length; ret++) {
+			int i = orderToSolve[ret] / emptyCells.length;
+			int j = orderToSolve[ret] % emptyCells.length;
+			
+			if(emptyCells[i][j]) {
+				
+				if(numEmptyCellsSkipped == numEmptyCellsToSkip) {
+					nextI = i;
+					nextJ = j;
+					break;
+				}
+				numEmptyCellsSkipped++;
+
+			}
+		}
+		
+		return ret;
+	}
+
+	
 
 	public static boolean P1TURN = true;
 	public static boolean P2TURN = false;
@@ -208,13 +239,110 @@ public class SolveUtilFunctions {
 	
 	
 	
+	//TODO: this is slower than not using it.
+	//TODO: Maybe try to extend the board and make this dynamic!
+	// ex: getBlanksUsedIntentionally should not be called all the time
 	
-	//TODO: seperate out part to solve MPMP
-	
-	//TODO: make it immutable!
-	public static SolitaryBoard insertAllImpliedPegsForNotDoneGame(SolitaryBoard current, int limitP1Pegs, int limitP2Pegs, int limitBlankPegs, int orderToSolve[], int numSpotsUsed) {
+	public static boolean isStillAbleToGetToPartiallyDoneGame(SolitaryBoard current, int limitP1Pegs, int limitP2Pegs, int orderToSolve[], int numSpotsUsed) {
 
-		return null;
+
+		//Get table properties:
+		int table[][] = current.getTable();
+		boolean p1Movable[][] = current.getP1Movable();
+		boolean p2Movable[][] = current.getP2Movable();
+
+		int curNumP1Pegs = current.getNumPiecesForPlayer1();
+		int curNumP2Pegs = current.getNumPiecesForPlayer2();
+		
+		int curNumBlanksUsed = getNumBlanksUsedIntentionally(current, orderToSolve, numSpotsUsed);
+		boolean blankUsed[][] = getBlanksUsedIntentionally(current, orderToSolve, numSpotsUsed);
+		
+		//Get limit blanks used:
+		int numCells = table.length * table[0].length;
+		int limitBlankSpacesUsed = numCells - limitP1Pegs - limitP2Pegs;
+		
+		//Setup variables:
+		int numCouldBeP1Colour = 0;
+		int numCouldBeP2Colour = 0;
+		
+		for(int i=0; i<table.length; i++) {
+			for(int j=0; j<table[i].length; j++) {
+				
+				if(blankUsed[i][j] == false && table[i][j] == Constants.EMPTY) {
+					
+					if(p1Movable[i][j]) {
+						numCouldBeP1Colour++;
+					}
+					
+					if(p2Movable[i][j]) {
+						numCouldBeP2Colour++;
+					}
+					
+					if(p1Movable[i][j] == false && 
+							p2Movable[i][j] == false) {
+
+						curNumBlanksUsed++;
+						
+						if(curNumBlanksUsed > limitBlankSpacesUsed) {
+							return false;
+						}
+					
+					}
+					
+				}
+				
+			}
+		}
+		
+		//test if it's not impossible that the pegs could still be filled up:
+		if(curNumP1Pegs + numCouldBeP1Colour < limitP1Pegs) {
+			return false;
+	
+		} else if(curNumP2Pegs + numCouldBeP2Colour < limitP2Pegs) {
+			return false;
+		
+		} else { 
+			//If still possible that the pegs could be filled up, 
+			return true;
+		}
+	}
+	
+	public static boolean[][] getBlanksUsedIntentionally(SolitaryBoard current, int orderToSolve[], int numSpotsUsed) {
+		int table[][] = current.getTable();
+		int numBlanksUsed = 0;
+		boolean ret[][] = new boolean[table.length][table[0].length];
+		for(int i=0; i<ret.length; i++) {
+			for(int j=0; j<ret.length; j++) {
+				ret[i][j] = false;
+			}
+		}
+		
+		
+		
+		for(int k=0; k<numSpotsUsed; k++) {
+			int i = orderToSolve[k] / table.length;
+			int j = orderToSolve[k] % table.length;
+			if(table[i][j] == Constants.EMPTY) {
+				ret[i][j] = true;
+			}
+		}
+		
+		return ret;
+	}
+	
+	public static int getNumBlanksUsedIntentionally(SolitaryBoard current, int orderToSolve[], int numSpotsUsed) {
+		int table[][] = current.getTable();
+		int numBlanksUsed = 0;
+		
+		for(int k=0; k<numSpotsUsed; k++) {
+			int i = orderToSolve[k] / table.length;
+			int j = orderToSolve[k] % table.length;
+			if(table[i][j] == Constants.EMPTY) {
+				numBlanksUsed++;
+			}
+		}
+		
+		return numBlanksUsed;
 	}
 
 
