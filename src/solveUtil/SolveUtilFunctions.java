@@ -362,4 +362,26 @@ public class SolveUtilFunctions {
 		return numPegsOnBoard/2;
 	}
 	
+	
+	public static int getNumSpacesPlayerCouldMove(SolitaryBoard current, boolean isTryingToFindP1loss) {
+		int ret = 0;
+		
+		boolean optionsToMove[][];
+		if(isTryingToFindP1loss) {
+			optionsToMove = current.getP1Movable();
+		} else  {
+			optionsToMove = current.getP2Movable();
+		}
+		
+		for(int i=0; i<optionsToMove.length; i++) {
+			for(int j=0; j<optionsToMove[i].length; j++) {
+				if(optionsToMove[i][j]) {
+					ret++;
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
 }

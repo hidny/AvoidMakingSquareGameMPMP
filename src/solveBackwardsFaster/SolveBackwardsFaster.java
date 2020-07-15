@@ -1,4 +1,4 @@
-package solveNbyNBackwardsTODO;
+package solveBackwardsFaster;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -7,17 +7,20 @@ import java.util.Scanner;
 import env.Constants;
 import solveMPMP.SolitaryBoard;
 import solveUtil.SolveUtilFunctions;
+import solveUtil.UtilityFunctions;
 
 //TODO: need to debug!!!
-public class SolveBackwards {
+public class SolveBackwardsFaster {
 
+	//TODO: only deal with 1 colour
 	
 	//There's a bug with N=8... :(
 	public static int N = 4;
 	public static int NUM_CELLS = N * N;
 	public static boolean FIND_PLAYER1_LOSSES = false;
+	
+	public static long pascalsTriangle[][] = UtilityFunctions.createPascalTriangle(NUM_CELLS + 1);
 
-	//num player 1 losing/tying solutions for a 4x4 board: 29340
 	//num player 2 losing/tying solutions for a 4x4 board: 16932
 	
 	// N= 5
@@ -26,7 +29,7 @@ public class SolveBackwards {
 	
 	public static void main(String[] args) {
 		
-		System.out.println("Start");
+		System.out.println("Start faster");
 		
 		int emptySpaces;
 		
@@ -54,7 +57,6 @@ public class SolveBackwards {
 			
 			System.out.println("Solve Losing positions (or tying) with " + emptySpaces + " empty spaces left:");
 			solvePositionsWhereNextMoveLoses(NUM_CELLS - emptySpaces, true);
-			
 			//TODO: translate lossing positions into losing positions 2 moves back, unless were at the very start.
 		}
 		
@@ -82,50 +84,8 @@ public class SolveBackwards {
 	public static boolean P2TURN = false;
 	
 	
-	//TODO:
-	//IDEA:
-	//I want positions where P2 is to play and (lose/tie)...
-	
-	//My guess is that I should backtrack:
-	//So, in the case of N=5
-	//A solution has to be N*N - 2 = 23 cells on the table.
-	//And there can't be any squares (and P2 can't win)
-	
-	//Try:
-	//param  solveLoss(N, depth, isTieALoss, int maxNumMovesToLose = Infinity)
-	// ex: solveLoss(5, 23, true, 1)
-	
-	//From the answers
-	
-	//Stratgy: start with just looking for a losing position:
-		//EZ:
-		//Maybe find all possible positions where P1 played 12 time and P2 played 11 times and P2 will not win.
-		
-		//1st: find all possible positions where P1 played 12 time and P2 played 11 times by reusing solve funcion
-			// For every such position, check if P2 can win with the AlphaBetaPrune Player
-		
-		//One we get that, we can try to do:
-		//solveLoss(N, depth, isTieALoss, int maxNumMovesToLose = Infinity)
-		//solveLoss(5, 21, true, 3)
-		
-		//This can maybe rely on the answer to solveLoss(5, 23, true, 1), so the alpha beta pruner only has to do 2 plys.
-		
-		//Then:
-		//solveLoss(5, 19, true, 3)
-		//This can maybe rely on the answer to solveLoss(5, 21, true, 3), so the alpha beta pruner only has to do 2 plys.
-		
-		//...
-		//solveLoss(5, 1, true, 23)
-		//Done...
-		//The hope is that Player 2 doesn't really lose
-		
-		//If this doesn't work, try letting Player 2 accept ties
-		
-		//Or:
-		//Try finding positions Player 1 loses.
-	
-	
-	
+	//Make it faster by only searching with 1 colour of peg
+
 	//TODO: start with 4x4 case because it can be completely checked against AlphaBetaPrunPlayer
 	
 	public static ArrayList<BigInteger> solveForTiedFinalPositions() {
@@ -135,7 +95,7 @@ public class SolveBackwards {
 	
 	//Recursive function to get
 	//Get all losing positions for player 2
-	public static ArrayList<BigInteger> solvePositionsWhereNextMoveLoses(int numPegsOnBoard, boolean tieIsAsGoodAsLoss) {
+	public static ArrayList<BigInteger> solvePositionsWhereNextMoveLoses(int numPegsToPlaceOnBoard, boolean tieIsAsGoodAsLoss) {
 		
 		SolitaryBoard board = new SolitaryBoard(N);
 		
@@ -155,80 +115,122 @@ public class SolveBackwards {
 		}
 		
 		
-		return solveLosingPositions1MoveAway(board, orderToSolve, 0, numPegsOnBoard, tieIsAsGoodAsLoss);
+		return solveLosingPositions1MoveAway(board, orderToSolve, 0, numPegsToPlaceOnBoard, tieIsAsGoodAsLoss);
 	}
 	
-	public static ArrayList<BigInteger> solveLosingPositions1MoveAway(SolitaryBoard current, int orderToSolve[], int numSpacesSkipped, int numPegsOnBoard, boolean tieIsAsGoodAsLoss) {
+	public static ArrayList<BigInteger> solveLosingPositions1MoveAway(SolitaryBoard current, int orderToSolve[], int indexToAdd, int numPegToPlacesOnBoard, boolean tieIsAsGoodAsLoss) {
 		
 		
+		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();;
 		//Check for valid solution
 
+		if(indexToAdd >= orderToSolve.length) {
+			return ret;
+		}
 
-		int numP1PiecesNeeded = SolveUtilFunctions.numP1PiecesNeeded(numPegsOnBoard);
-		int numP2PiecesNeeded = SolveUtilFunctions.numP2PiecesNeeded(numPegsOnBoard);
+		int numP1PiecesNeeded = SolveUtilFunctions.numP1PiecesNeeded(numPegToPlacesOnBoard);
+		int numP2PiecesNeeded = SolveUtilFunctions.numP2PiecesNeeded(numPegToPlacesOnBoard);
+
+		boolean placingP1pegs;
 		
-		int numSpaceNeeded = NUM_CELLS - numPegsOnBoard;
-		
-		if( (current.getNumPiecesForPlayer1() == numP1PiecesNeeded)
-			&& current.getNumPiecesForPlayer2() == numP2PiecesNeeded) {
+		if(numPegToPlacesOnBoard % 2 == 0) {
+			//Trying to find when P1 loses
+			placingP1pegs = true;
 			
-			double eval = current.naiveShallowEval(isPlayer1Turn(current) == true);
-			
-			if( (isPlayer1Turn(current) == true && eval < 0.0)
-				|| (isPlayer1Turn(current) == false && eval > 0.0)) {
-				/*System.out.println("Found solution.");
-				if(isPlayer1Turn(current)) {
-					System.out.println("Player 1's turn");
-				} else {
-					System.out.println("Player 2's turn");
-				}
-				
-				current.draw();
-				System.out.println("TODO: record and check if it's an insta loss...");
-				*/
-
-				numSolutions++;
-			} else if(tieIsAsGoodAsLoss && numSpaceNeeded == 0) {
-				//It's a tie
-				/*System.out.println("Found a Solution that's a Tie!");
-				if(isPlayer1Turn(current)) {
-					System.out.println("Player 1's turn");
-				} else {
-					System.out.println("Player 2's turn");
-				}
-				
-				current.draw();
-				System.out.println("TODO: record and check if it's an insta loss...");
-				*/
-
-				numSolutions++;
-			}
-			
-			
+		} else {
+			//Trying to find when P2 loses
+			placingP1pegs = false;
 		}
 		
-		//Dude, who wrote this part?
-		int coord[] = SolveUtilFunctions.getNextCellToConsider(SolveUtilFunctions.getEmptyCells(current), orderToSolve, numSpacesSkipped);
-		int nextI = coord[0];
-		int nextJ = coord[1];
-		//End Dude
+		if(placingP1pegs) {
+			if( current.getNumPiecesForPlayer1() == numP1PiecesNeeded) {
+				
+				int numSpacesPlayerCouldMove = SolveUtilFunctions.getNumSpacesPlayerCouldMove(current, placingP1pegs);
+				
+				if(numSpacesPlayerCouldMove <= numP2PiecesNeeded) {
+					
+					int numFreeSpacesForPlayer2 = NUM_CELLS - numP1PiecesNeeded - numSpacesPlayerCouldMove;
+					int numFreePegsForPlayer2 = numP2PiecesNeeded - numSpacesPlayerCouldMove;
+					
+					//TODO: not everything is a solution here:
+					numSolutions += pascalsTriangle[numFreeSpacesForPlayer2][numFreePegsForPlayer2];
+					
+					current.draw();
+				//TODO: figure out actual solutions:
+					
+					//TODO: get player 2 to fill the places it needs to use to 'checkmate' player 1.
+					
+					//Board minimalCheckmateBoard = board.fillWithP1PegsNeeded to checkmate P2
+					
+					//if(tmpBoard == null) {
+					//No solution
+					//return ret
+					//} 
+					// else {
+					//Keep going
+					//}
+					
+					//int freeSpaceCodes[] = TODO
+					boolean combo[] = new boolean[numFreeSpacesForPlayer2];
+					for(int i=0; i<combo.length; i++) {
+						if(i<numFreePegsForPlayer2) {
+							combo[i] = true;
+						} else {
+							combo[i] = false;
+						}
+					}
+
+					//for every combination of P2 pegs:
+					while(combo != null) {
+						
+						//try to build board with it
+	
+						//Bonus: Avoid rebuilding completely after every combo iteration by identifying when the pegs placed are the same as last time
+						
+						//If could build board and there's no squares
+						//If you could build it, then it's a solution
+						
+						int codesUsed[] = new int[numSpacesPlayerCouldMove];
+						SolitaryBoard step[] = new SolitaryBoard[numSpacesPlayerCouldMove];
+						
+						
+						//TODO:
+						//if(itworks) {
+						//numsolutions++
+						//}
+					
+						
+						combo = UtilityFunctions.getNextCombination(combo);
+					}
+					//Compare # of solution to the # doing it the slow way
+					
+				} else {
+					//do nothing
+				}
+			
+			
+				return ret;
+				
+			}
+		} else {
+			//TODO: Reflect on code above...
+		}
+	
+	
+		int codeToConsider = orderToSolve[indexToAdd];
+		int nextI = codeToConsider / N;
+		int nextJ = codeToConsider % N;
 		
-		
-		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();
 		
 		//Try to insert P1 peg
-		if(current.getNumPiecesForPlayer1() < numP1PiecesNeeded) {
+		if(placingP1pegs && current.getNumPiecesForPlayer1() < numP1PiecesNeeded) {
 			
 			//try insert P1
 			SolitaryBoard tmpBoard = current.moveNullOnLoss(nextI, nextJ, P1TURN);
 			
 			if(tmpBoard != null) {
 				
-				//TODO: this function doesn't work, but you could at least try to notice when too many cells need to be skipped...
-				//And insert all implied pegs
-				//SolitaryBoard nextPosToAnalyze = SolveUtilFunctions.insertAllImpliedPegsForNotDoneGame(tmpBoard, numP1PiecesNeeded, numP2PiecesNeeded, numSpaceNeeded);
-				
-				ret.addAll(solveLosingPositions1MoveAway(tmpBoard, orderToSolve, numSpacesSkipped, numPegsOnBoard, tieIsAsGoodAsLoss));
+				ret.addAll(solveLosingPositions1MoveAway(tmpBoard, orderToSolve, indexToAdd+1, numPegToPlacesOnBoard, tieIsAsGoodAsLoss));
 				
 			}
 			//solve for next pos
@@ -239,17 +241,14 @@ public class SolveBackwards {
 		
 
 		//Try to insert P2 peg
-		if(current.getNumPiecesForPlayer2() < numP2PiecesNeeded) {
+		if(placingP1pegs == false && current.getNumPiecesForPlayer2() < numP2PiecesNeeded) {
 			
 			//try insert P2
 			SolitaryBoard tmpBoard = current.moveNullOnLoss(nextI, nextJ, P2TURN);
 			
 			if(tmpBoard != null) {
-				//And insert all implied pegs
 				
-				//TODO: see above and create function to filter out pos with too many empty spots (numSpacesSkipped + other forced empty spots we will eventually hit) 
-				
-				ret.addAll(solveLosingPositions1MoveAway(tmpBoard, orderToSolve, numSpacesSkipped, numPegsOnBoard, tieIsAsGoodAsLoss));
+				ret.addAll(solveLosingPositions1MoveAway(tmpBoard, orderToSolve, indexToAdd+1, numPegToPlacesOnBoard, tieIsAsGoodAsLoss));
 			
 			}
 			//solve for next pos
@@ -257,11 +256,8 @@ public class SolveBackwards {
 		}
 		//END try to insert P2 peg
 		
-		//Try to insert space
-		if(numSpacesSkipped + 1 <= numSpaceNeeded) {
-			ret.addAll(solveLosingPositions1MoveAway(current, orderToSolve, numSpacesSkipped + 1, numPegsOnBoard, tieIsAsGoodAsLoss));
-		}
-		//Done
+		ret.addAll(solveLosingPositions1MoveAway(current, orderToSolve, indexToAdd+1, numPegToPlacesOnBoard, tieIsAsGoodAsLoss));
+
 		
 		return ret;
 	}
