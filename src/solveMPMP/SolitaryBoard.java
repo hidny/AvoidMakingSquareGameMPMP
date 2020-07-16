@@ -191,7 +191,7 @@ public class SolitaryBoard {
 	}
 	
 	public SolitaryBoard playMove(int i, int j, boolean isP1turn) {
-		SolitaryBoard newBoard = hardCopyForNextRound();
+		SolitaryBoard newBoard = hardCopy();
 		
 		//Take the space:
 		newBoard.P1Movable[i][j] = false;
@@ -318,7 +318,7 @@ public class SolitaryBoard {
 		
 	}
 	
-	public SolitaryBoard hardCopyForNextRound() {
+	public SolitaryBoard hardCopy() {
 		
 		return new SolitaryBoard(this.table, this.P1Movable, this.P2Movable, this.numPieces, this.numPiecesForPlayer1);
 		

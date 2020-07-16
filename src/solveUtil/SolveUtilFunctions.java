@@ -384,4 +384,73 @@ public class SolveUtilFunctions {
 		return ret;
 	}
 	
+	
+	//TODO: order search to make it slightly faster? Nahh....
+	
+	public static SolitaryBoard fillUpBoardForCheckmate(SolitaryBoard current, boolean isP1Loss) {
+		
+		SolitaryBoard ret = current.hardCopy();
+		
+		boolean pegsToFill[][];
+		
+		boolean isFillingWithP1 = !isP1Loss;
+		
+		if(isP1Loss) {
+		
+			pegsToFill = current.getP1Movable();
+		} else {
+
+			pegsToFill = current.getP2Movable();
+		}
+		
+		for(int i=0; i<pegsToFill.length; i++) {
+			for(int j=0; j<pegsToFill[i].length; j++) {
+				if(pegsToFill[i][j]) {
+					ret = ret.moveNullOnLoss(i, j, isFillingWithP1);
+					
+					if(ret == null) {
+						return null;
+					}
+				}
+			}
+		}
+		
+		return ret;
+		
+	}
+	
+	public static int[] getMovableLocations(SolitaryBoard current, boolean isP1Moving) {
+		//First get num
+		
+		boolean movableTable[][];
+		if(isP1Moving) {
+			movableTable = current.getP1Movable();
+		} else {
+			movableTable = current.getP2Movable();
+		}
+		
+		int size = 0;
+		for(int i=0; i<movableTable.length; i++) {
+			for(int j=0; j<movableTable[i].length; j++) {
+				if(movableTable[i][j]) {
+					size++;
+				}
+			}
+		}
+		
+		int ret[] = new int[size];
+		int currentIndex = 0;
+		
+		for(int i=0; i<movableTable.length; i++) {
+			for(int j=0; j<movableTable[i].length; j++) {
+				if(movableTable[i][j]) {
+					ret[currentIndex] = i*movableTable.length + j;
+					currentIndex++;
+				}
+			}
+		}
+		
+		return ret;
+		
+	}
 }

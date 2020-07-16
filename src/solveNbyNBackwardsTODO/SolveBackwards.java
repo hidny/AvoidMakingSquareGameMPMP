@@ -2,6 +2,7 @@ package solveNbyNBackwardsTODO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
 
 import env.Constants;
@@ -15,7 +16,7 @@ public class SolveBackwards {
 	//There's a bug with N=8... :(
 	public static int N = 4;
 	public static int NUM_CELLS = N * N;
-	public static boolean FIND_PLAYER1_LOSSES = false;
+	public static boolean FIND_PLAYER1_LOSSES = true;
 
 	//num player 1 losing/tying solutions for a 4x4 board: 29340
 	//num player 2 losing/tying solutions for a 4x4 board: 16932
@@ -63,6 +64,7 @@ public class SolveBackwards {
 		} else {
 			System.out.println("num player 2 losing/tying solutions for a " + N + "x" + N + " board: " + numSolutions);
 		}
+		System.out.println("Num of unique solutions: " + codes.size());
 		
 		if(searchPosWhereOddNumSpacesLeft == true) {
 			System.out.println("Searched where there were an ODD number of empty cells left in the position");
@@ -158,6 +160,8 @@ public class SolveBackwards {
 		return solveLosingPositions1MoveAway(board, orderToSolve, 0, numPegsOnBoard, tieIsAsGoodAsLoss);
 	}
 	
+	public static HashSet<BigInteger> codes = new HashSet<BigInteger>();
+	
 	public static ArrayList<BigInteger> solveLosingPositions1MoveAway(SolitaryBoard current, int orderToSolve[], int numSpacesSkipped, int numPegsOnBoard, boolean tieIsAsGoodAsLoss) {
 		
 		
@@ -187,6 +191,8 @@ public class SolveBackwards {
 				System.out.println("TODO: record and check if it's an insta loss...");
 				*/
 
+				System.out.println("code: " + current.getUniqueCode());
+				codes.add(current.getUniqueCode());
 				numSolutions++;
 			} else if(tieIsAsGoodAsLoss && numSpaceNeeded == 0) {
 				//It's a tie
@@ -200,6 +206,9 @@ public class SolveBackwards {
 				current.draw();
 				System.out.println("TODO: record and check if it's an insta loss...");
 				*/
+				
+				System.out.println("code: " + current.getUniqueCode());
+				codes.add(current.getUniqueCode());
 
 				numSolutions++;
 			}
