@@ -2,6 +2,7 @@ package solveBackwardsFaster;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
 
 import env.Constants;
@@ -22,7 +23,8 @@ public class SolveBackwardsFaster {
 	public static long pascalsTriangle[][] = UtilityFunctions.createPascalTriangle(NUM_CELLS + 1);
 
 	//Not quite...
-	//num player 1 losing/tying solutions for a 4x4 board: 16693
+	//num player 1 losing/tying solutions for a 4x4 board: 25110
+	//Searched where there were an EVEN number of empty cells left in the position
 	
 	
 	public static void main(String[] args) {
@@ -64,6 +66,8 @@ public class SolveBackwardsFaster {
 			System.out.println("num player 2 losing/tying solutions for a " + N + "x" + N + " board: " + numSolutions);
 		}
 		
+		System.out.println("Num of unique solutions: " + codes.size());
+		
 		if(searchPosWhereOddNumSpacesLeft == true) {
 			System.out.println("Searched where there were an ODD number of empty cells left in the position");
 		} else {
@@ -76,6 +80,8 @@ public class SolveBackwardsFaster {
 	public static Scanner in = new Scanner(System.in);
 	
 	public static int numSolutions = 0;
+
+	public static HashSet<BigInteger> codes = new HashSet<BigInteger>();
 	
 
 	public static boolean P1TURN = true;
@@ -157,11 +163,11 @@ public class SolveBackwardsFaster {
 						return ret;
 					}
 					
-					int freeSpaceCodes[] = SolveUtilFunctions.getMovableLocations(current, isP1WinningPegs);
+					int freeSpaceCodes[] = SolveUtilFunctions.getMovableLocations(minimalCheckmater, isP1WinningPegs);
 					
 					boolean combo[] = new boolean[freeSpaceCodes.length];
 					for(int i=0; i<combo.length; i++) {
-						if(i < numP2PiecesNeeded -  numSpacesP1CouldMove) {
+						if(i < freeSpaceCodes.length -  numSpacesP1CouldMove) {
 							combo[i] = true;
 						} else {
 							combo[i] = false;
@@ -198,6 +204,7 @@ public class SolveBackwardsFaster {
 							System.out.println("code: " + comboBoard.getUniqueCode());
 							comboBoard.draw();
 							numSolutions++;
+							codes.add(comboBoard.getUniqueCode());
 						}
 					
 						

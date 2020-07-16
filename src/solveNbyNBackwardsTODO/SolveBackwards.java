@@ -16,10 +16,13 @@ public class SolveBackwards {
 	//There's a bug with N=8... :(
 	public static int N = 4;
 	public static int NUM_CELLS = N * N;
-	public static boolean FIND_PLAYER1_LOSSES = true;
+	public static boolean FIND_PLAYER1_LOSSES = false;
 
 	//num player 1 losing/tying solutions for a 4x4 board: 29340
+	//Num of unique solutions: 27342
+
 	//num player 2 losing/tying solutions for a 4x4 board: 16932
+	//Num of unique solutions: 16122
 	
 	// N= 5
 	// solveLosingPositions(23, true);
