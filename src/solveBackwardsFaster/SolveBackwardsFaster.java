@@ -16,7 +16,7 @@ public class SolveBackwardsFaster {
 	//TODO: only deal with 1 colour
 	
 	//There's a bug with N=8... :(
-	public static int N = 4;
+	public static int N = 3;
 	public static int NUM_CELLS = N * N;
 	public static boolean FIND_PLAYER1_LOSSES = true;
 	
@@ -40,8 +40,8 @@ public class SolveBackwardsFaster {
 			searchPosWhereOddNumSpacesLeft = true;
 		}
 		
-		//TOOD Find ties:
-		solveForTiedFinalPositions();
+		//TODO Find ties
+		//solveForTiedFinalPositions();
 		
 		//TODO: translate ties into losing positions 1-2 moves back.
 		
@@ -57,7 +57,10 @@ public class SolveBackwardsFaster {
 			
 			System.out.println("Solve Losing positions (or tying) with " + emptySpaces + " empty spaces left:");
 			solvePositionsWhereNextMoveLoses(NUM_CELLS - emptySpaces, true);
-			//TODO: translate lossing positions into losing positions 2 moves back, unless were at the very start.
+			//TODO: translate losing positions into losing positions 2 moves back, unless were at the very start.
+			
+
+			System.out.println("Num solutions so far: " + codes.size());
 		}
 		
 		if(FIND_PLAYER1_LOSSES == true) {
@@ -75,6 +78,33 @@ public class SolveBackwardsFaster {
 		}
 		
 		
+		debugPrintSolutionCodes();
+		
+	}
+	
+	
+	public static void debugPrintSolutionCodes() {
+		System.out.println("Solution codes listed in order:");
+		
+		Object codesArray[] = codes.toArray();
+		
+		for(int i=0; i<codesArray.length; i++) {
+			int bestIndex = i;
+			for(int j=i+1; j<codesArray.length; j++) {
+				
+				if(((BigInteger)codesArray[bestIndex]).compareTo((BigInteger)codesArray[j]) < 0) {
+					bestIndex = j;
+				}
+			}
+			
+			Object tmp = codesArray[i];
+			codesArray[i] = codesArray[bestIndex];
+			codesArray[bestIndex] = tmp;
+		}
+		
+		for(int i=0; i<codesArray.length; i++) {
+			System.out.println((BigInteger)codesArray[i]);
+		}
 	}
 	
 	public static Scanner in = new Scanner(System.in);
@@ -128,10 +158,8 @@ public class SolveBackwardsFaster {
 		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();;
 		//Check for valid solution
 
-		if(indexToAdd >= orderToSolve.length) {
-			return ret;
-		}
-
+	
+		//See if there's a solution
 		int numP1PiecesNeeded = SolveUtilFunctions.numP1PiecesNeeded(numPegToPlacesOnBoard);
 		int numP2PiecesNeeded = SolveUtilFunctions.numP2PiecesNeeded(numPegToPlacesOnBoard);
 
@@ -167,7 +195,7 @@ public class SolveBackwardsFaster {
 					
 					boolean combo[] = new boolean[freeSpaceCodes.length];
 					for(int i=0; i<combo.length; i++) {
-						if(i < freeSpaceCodes.length -  numSpacesP1CouldMove) {
+						if(i < numP2PiecesNeeded -  numSpacesP1CouldMove) {
 							combo[i] = true;
 						} else {
 							combo[i] = false;
@@ -224,6 +252,11 @@ public class SolveBackwardsFaster {
 			System.out.println("ERROR: Only testing P1 checkmates for now");
 		}
 	
+		
+		//Try to Add stuff:
+		if(indexToAdd >= orderToSolve.length) {
+			return ret;
+		}
 	
 		int codeToConsider = orderToSolve[indexToAdd];
 		int nextI = codeToConsider / N;
@@ -264,6 +297,8 @@ public class SolveBackwardsFaster {
 		}
 		//END try to insert P2 peg
 		
+		
+		//ignore current space:
 		ret.addAll(solveLosingPositions1MoveAway(current, orderToSolve, indexToAdd+1, numPegToPlacesOnBoard, tieIsAsGoodAsLoss));
 
 		
@@ -282,44 +317,3 @@ public class SolveBackwardsFaster {
 	}
 	
 }
-/* Start
-+Did not use isStillAbleToGetToPartiallyDoneGame
-+Printing order to solve:
-+22   16   10   13   21
-+17   5    1    6    14
-+9    2    0    3    11
-+15   7    4    8    18
-+23   19   12   20   24
-+Solve Losing positions (or tying) with 2 empty spaces left:
-+Printing order to solve:
-+22   16   10   13   21
-+17   5    1    6    14
-+9    2    0    3    11
-+15   7    4    8    18
-+23   19   12   20   24
-+Found 2821954 losing positions so far (only checking losing positions 1 move away from loss)
-+Solve Losing positions (or tying) with 4 empty spaces left:
-+Printing order to solve:
-+22   16   10   13   21
-+17   5    1    6    14
-+9    2    0    3    11
-+15   7    4    8    18
-+23   19   12   20   24
-+Found 19561751 losing positions so far (only checking losing positions 1 move away from loss)
-+Solve Losing positions (or tying) with 6 empty spaces left:
-+Printing order to solve:
-+22   16   10   13   21
-+17   5    1    6    14
-+9    2    0    3    11
-+15   7    4    8    18
-+23   19   12   20   24
-+Found 21956935 losing positions so far (only checking losing positions 1 move away from loss)
-+Solve Losing positions (or tying) with 8 empty spaces left:
-+Printing order to solve:
-+22   16   10   13   21
-+17   5    1    6    14
-+9    2    0    3    11
-+15   7    4    8    18
-+23   19   12   20   24
-+
-*/

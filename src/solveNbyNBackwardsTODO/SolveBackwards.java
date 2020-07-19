@@ -14,9 +14,9 @@ public class SolveBackwards {
 
 	
 	//There's a bug with N=8... :(
-	public static int N = 4;
+	public static int N = 3;
 	public static int NUM_CELLS = N * N;
-	public static boolean FIND_PLAYER1_LOSSES = false;
+	public static boolean FIND_PLAYER1_LOSSES = true;
 
 	//num player 1 losing/tying solutions for a 4x4 board: 29340
 	//Num of unique solutions: 27342
@@ -41,11 +41,14 @@ public class SolveBackwards {
 			searchPosWhereOddNumSpacesLeft = true;
 		}
 		
-		//Find ties:
-		solveForTiedFinalPositions();
+		//Find ties: (TODO: refind ties)
+		//solveForTiedFinalPositions();
+		//System.out.println("After solve for tie: " + codes.size());
 		
 		//TODO: translate ties into losing positions 1-2 moves back.
 		
+		
+		//TODO: uncomment:
 		//Find loses
 		for(int i=1; 2*i <=NUM_CELLS; i++) {
 			
@@ -59,13 +62,15 @@ public class SolveBackwards {
 			System.out.println("Solve Losing positions (or tying) with " + emptySpaces + " empty spaces left:");
 			solvePositionsWhereNextMoveLoses(NUM_CELLS - emptySpaces, true);
 			
+			System.out.println("Num solutions so far: " + codes.size());
+			
 			//TODO: translate lossing positions into losing positions 2 moves back, unless were at the very start.
 		}
 		
 		if(FIND_PLAYER1_LOSSES == true) {
-			System.out.println("num player 1 losing/tying solutions for a " + N + "x" + N + " board: " + numSolutions);
+			System.out.println("num player 1 losing/tying solutions for a " + N + "x" + N + " board (with duplicates): " + numSolutions);
 		} else {
-			System.out.println("num player 2 losing/tying solutions for a " + N + "x" + N + " board: " + numSolutions);
+			System.out.println("num player 2 losing/tying solutions for a " + N + "x" + N + " board (with duplicates):" + numSolutions);
 		}
 		System.out.println("Num of unique solutions: " + codes.size());
 		
@@ -75,7 +80,32 @@ public class SolveBackwards {
 			System.out.println("Searched where there were an EVEN number of empty cells left in the position");
 		}
 		
+		debugPrintSolutionCodes();
+	}
+	
+
+	public static void debugPrintSolutionCodes() {
+		System.out.println("Solution codes listed in order:");
 		
+		Object codesArray[] = codes.toArray();
+		
+		for(int i=0; i<codesArray.length; i++) {
+			int bestIndex = i;
+			for(int j=i+1; j<codesArray.length; j++) {
+				
+				if(((BigInteger)codesArray[bestIndex]).compareTo((BigInteger)codesArray[j]) < 0) {
+					bestIndex = j;
+				}
+			}
+			
+			Object tmp = codesArray[i];
+			codesArray[i] = codesArray[bestIndex];
+			codesArray[bestIndex] = tmp;
+		}
+		
+		for(int i=0; i<codesArray.length; i++) {
+			System.out.println((BigInteger)codesArray[i]);
+		}
 	}
 	
 	public static Scanner in = new Scanner(System.in);
@@ -183,7 +213,10 @@ public class SolveBackwards {
 			
 			if( (isPlayer1Turn(current) == true && eval < 0.0)
 				|| (isPlayer1Turn(current) == false && eval > 0.0)) {
-				/*System.out.println("Found solution.");
+				System.out.println("Found solution.");
+
+				System.out.println("code: " + current.getUniqueCode());
+				
 				if(isPlayer1Turn(current)) {
 					System.out.println("Player 1's turn");
 				} else {
@@ -192,14 +225,15 @@ public class SolveBackwards {
 				
 				current.draw();
 				System.out.println("TODO: record and check if it's an insta loss...");
-				*/
+				
 
-				System.out.println("code: " + current.getUniqueCode());
+				//System.out.println(eval);
+				//System.out.println("code: " + current.getUniqueCode());
 				codes.add(current.getUniqueCode());
 				numSolutions++;
 			} else if(tieIsAsGoodAsLoss && numSpaceNeeded == 0) {
 				//It's a tie
-				/*System.out.println("Found a Solution that's a Tie!");
+				System.out.println("Found a Solution that's a Tie!");
 				if(isPlayer1Turn(current)) {
 					System.out.println("Player 1's turn");
 				} else {
@@ -208,11 +242,10 @@ public class SolveBackwards {
 				
 				current.draw();
 				System.out.println("TODO: record and check if it's an insta loss...");
-				*/
+				
 				
 				System.out.println("code: " + current.getUniqueCode());
 				codes.add(current.getUniqueCode());
-
 				numSolutions++;
 			}
 			
