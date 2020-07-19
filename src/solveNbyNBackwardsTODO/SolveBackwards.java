@@ -14,7 +14,7 @@ public class SolveBackwards {
 
 	
 	//There's a bug with N=8... :(
-	public static int N = 3;
+	public static int N = 4;
 	public static int NUM_CELLS = N * N;
 	public static boolean FIND_PLAYER1_LOSSES = true;
 
@@ -80,7 +80,7 @@ public class SolveBackwards {
 			System.out.println("Searched where there were an EVEN number of empty cells left in the position");
 		}
 		
-		debugPrintSolutionCodes();
+		//debugPrintSolutionCodes();
 	}
 	
 
