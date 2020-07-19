@@ -196,7 +196,7 @@ public class SolveBackwardsFaster {
 				
 				if(tmpBoard.getNumPieces() == numLosingPegsNeeded) {
 					tmpBoard.draw();
-					return findSolutionsByAddingOpponentPegs(tmpBoard, isP1Losing, numP1PiecesNeeded, numP2PiecesNeeded);
+					ret.addAll( findSolutionsByAddingOpponentPegs(tmpBoard, isP1Losing, numP1PiecesNeeded, numP2PiecesNeeded));
 					
 				} else if(tmpBoard.getNumPieces() < numLosingPegsNeeded) {
 					
