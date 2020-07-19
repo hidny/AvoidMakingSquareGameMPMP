@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 
-import env.Constants;
 import solveMPMP.SolitaryBoard;
 import solveUtil.SolveUtilFunctions;
 import solveUtil.UtilityFunctions;
@@ -155,7 +154,7 @@ public class SolveBackwardsFaster {
 	public static ArrayList<BigInteger> solveLosingPositions1MoveAway(SolitaryBoard current, int orderToSolve[], int indexToAdd, int numPegToPlacesOnBoard, boolean tieIsAsGoodAsLoss) {
 		
 		
-		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();;
+		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();
 		//Check for valid solution
 
 	
@@ -173,83 +172,19 @@ public class SolveBackwardsFaster {
 			//Trying to find when P2 loses
 			isP1Losing = false;
 		}
+
 		boolean isP1WinningPegs = !isP1Losing;
 		
-		if(isP1Losing) {
-			if( current.getNumPiecesForPlayer1() == numP1PiecesNeeded) {
-				
-				int numSpacesP1CouldMove = SolveUtilFunctions.getNumSpacesPlayerCouldMove(current, isP1Losing);
-				
-				if(numSpacesP1CouldMove <= numP2PiecesNeeded) {
-					
-					
-					//current.draw();
-					
-					SolitaryBoard minimalCheckmater = SolveUtilFunctions.fillUpBoardForCheckmate(current, isP1Losing);
-					
-					if(minimalCheckmater == null) {
-						return ret;
-					}
-					
-					int freeSpaceCodes[] = SolveUtilFunctions.getMovableLocations(minimalCheckmater, isP1WinningPegs);
-					
-					boolean combo[] = new boolean[freeSpaceCodes.length];
-					for(int i=0; i<combo.length; i++) {
-						if(i < numP2PiecesNeeded -  numSpacesP1CouldMove) {
-							combo[i] = true;
-						} else {
-							combo[i] = false;
-						}
-					}
-
-
-					//TODO
-					//Bonus: Avoid rebuilding completely after every combo iteration by identifying when the pegs placed are the same as last time
-					//SolitaryBoard step[] = new SolitaryBoard[numSpacesPlayerCouldMove];
-					
-					//for every combination of P2 pegs:
-					while(combo != null) {
-						
-						//try to build board with it
-	
-						SolitaryBoard comboBoard = minimalCheckmater.hardCopy();
-						
-						//If you could build board and there's no squares
-						//If you could build it, then it's a solution
-						
-						for(int i=0; i<freeSpaceCodes.length; i++) {
-							if(combo[i]) {
-								comboBoard = comboBoard.moveNullOnLoss(freeSpaceCodes[i], isP1WinningPegs);
-								
-								if(comboBoard == null) {
-									break;
-								}
-							}
-						}
-
-						if(comboBoard != null) {
-							System.out.println("Solution:");
-							System.out.println("code: " + comboBoard.getUniqueCode());
-							comboBoard.draw();
-							numSolutions++;
-							codes.add(comboBoard.getUniqueCode());
-						}
-					
-						
-						combo = UtilityFunctions.getNextCombination(combo);
-					}
-					//Compare # of solution to the # doing it the slow way
-					
-				} //END IF CONDITION
+		//TODO: if pieces are placed
+		if( (isP1Losing && current.getNumPiecesForPlayer1() == numP1PiecesNeeded)
+				|| (isP1Losing == false && current.getNumPiecesForPlayer2() == numP2PiecesNeeded)) {
+		//END TODO
+			System.out.println("p1: " + numP1PiecesNeeded);
+			System.out.println("p2: " + numP2PiecesNeeded);
+			current.draw();
+			return findSolutionsByAddingOpponentPegs(current, isP1Losing, numP1PiecesNeeded, numP2PiecesNeeded);
+		
 			
-			
-				return ret;
-				
-			}
-		} else {
-			
-			//TODO: Reflect on code above...
-			System.out.println("ERROR: Only testing P1 checkmates for now");
 		}
 	
 		
@@ -314,6 +249,85 @@ public class SolveBackwardsFaster {
 		} else {
 			return false;
 		}
+	}
+	
+	//pre: losing player's pegs are all already place in current and they
+	//    are placed in legal positions.
+	public static ArrayList<BigInteger> findSolutionsByAddingOpponentPegs(SolitaryBoard current, boolean isP1Losing, int numP1PiecesNeeded, int numP2PiecesNeeded) {
+		
+		
+		int numSpacesLosingPlayerCouldMove = SolveUtilFunctions.getNumSpacesPlayerCouldMove(current, isP1Losing);
+		
+		int currentNumWinningPlayerPieces = -1;
+		if(isP1Losing) {
+			currentNumWinningPlayerPieces = numP2PiecesNeeded;
+		} else {
+			currentNumWinningPlayerPieces = numP1PiecesNeeded;
+		}
+		
+
+		if(SolveUtilFunctions.getNumSpacesPlayerCouldMove(current, isP1Losing) > currentNumWinningPlayerPieces) {
+			return new ArrayList<BigInteger>();
+		}
+		
+		boolean isP1WinningPegs = !isP1Losing;
+		
+		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();
+		
+		SolitaryBoard minimalCheckmater = SolveUtilFunctions.fillUpBoardForCheckmate(current, isP1Losing);
+		
+		if(minimalCheckmater == null) {
+			return ret;
+		}
+		
+		
+		//TODO: Try to place opponent pegs legally:
+		int freeSpaceCodes[] = SolveUtilFunctions.getMovableLocations(minimalCheckmater, isP1WinningPegs);
+		
+		boolean combo[] = new boolean[freeSpaceCodes.length];
+		for(int i=0; i<combo.length; i++) {
+			if(i < currentNumWinningPlayerPieces -  numSpacesLosingPlayerCouldMove) {
+				combo[i] = true;
+			} else {
+				combo[i] = false;
+			}
+		}
+
+
+		//TODO
+		//Bonus: Avoid rebuilding completely after every combo iteration by identifying when the pegs placed are the same as last time
+		//SolitaryBoard step[] = new SolitaryBoard[numSpacesPlayerCouldMove];
+		
+		//for every combination of P2 pegs:
+		while(combo != null) {
+			
+			//try to build board with it
+
+			SolitaryBoard comboBoard = minimalCheckmater.hardCopy();
+			
+			for(int i=0; i<freeSpaceCodes.length; i++) {
+				if(combo[i]) {
+					comboBoard = comboBoard.moveNullOnLoss(freeSpaceCodes[i], isP1WinningPegs);
+					
+					if(comboBoard == null) {
+						break;
+					}
+				}
+			}
+
+			if(comboBoard != null) {
+				System.out.println("Solution:");
+				System.out.println("code: " + comboBoard.getUniqueCode());
+				comboBoard.draw();
+				numSolutions++;
+				codes.add(comboBoard.getUniqueCode());
+			}
+		
+			
+			combo = UtilityFunctions.getNextCombination(combo);
+		}
+		
+		return ret;
 	}
 	
 }
