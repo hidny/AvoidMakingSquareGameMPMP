@@ -9,12 +9,16 @@ import solveMPMP.SolitaryBoard;
 import solveUtil.SolveUtilFunctions;
 import solveUtil.UtilityFunctions;
 
+
+//TODO: figure out if ties are already handled by both players
+// I suspect it's handled by one player, but not the other.
+
 //TODO: need to debug!!!
 public class SolveBackwardsFaster {
 
 	//TODO: only deal with 1 colour
 	
-	public static int N = 3;
+	public static int N = 6;
 	public static int NUM_CELLS = N * N;
 	public static boolean FIND_PLAYER1_LOSSES = false;
 	
@@ -59,7 +63,8 @@ public class SolveBackwardsFaster {
 			//TODO: translate losing positions into losing positions 2 moves back, unless were at the very start.
 			
 
-			System.out.println("Num solutions so far: " + codes.size());
+			System.out.println("Num possible duplicated solutions so far: " + numSolutions);
+			System.out.println("Num unique solutions so far: " + codes.size());
 		}
 		
 		if(FIND_PLAYER1_LOSSES == true) {
@@ -152,6 +157,8 @@ public class SolveBackwardsFaster {
 		}
 	}
 	
+	public static int debugCount = 0;
+	
 	public static ArrayList<BigInteger> solveLosingPositions1MoveAway(SolitaryBoard current, int orderToSolve[], int indexToAdd, int numPegToPlacesOnBoard) {
 		
 		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();
@@ -179,9 +186,16 @@ public class SolveBackwardsFaster {
 			if(tmpBoard.getNumPieces() == numLosingPegsNeeded) {
 				ret.addAll( findSolutionsByAddingOpponentPegs(tmpBoard, isP1Losing, numPegToPlacesOnBoard));
 				
+				debugCount++;
+				
+				if(debugCount % 10000 == 0) {
+					System.out.println("Debug count: " + debugCount);
+				}
+				
 			} else if(tmpBoard.getNumPieces() < numLosingPegsNeeded) {
 				
 				ret.addAll(solveLosingPositions1MoveAway(tmpBoard, orderToSolve, indexToAdd+1, numPegToPlacesOnBoard));
+				
 				
 			} else {
 				System.out.println("ERROR: there's too many pegs placed in solveLosingPositions1MoveAway");
@@ -297,13 +311,15 @@ public class SolveBackwardsFaster {
 			}
 
 			if(comboBoard != null) {
-				
+				/*
 				System.out.println("Solution:");
 				System.out.println("code: " + comboBoard.getUniqueCode());
 				comboBoard.draw();
+				*/
 				numSolutions++;
 				
-				codes.add(comboBoard.getUniqueCode());
+				//TODO: use codes later...
+				//codes.add(comboBoard.getUniqueCode());
 			}
 		
 			
@@ -314,3 +330,34 @@ public class SolveBackwardsFaster {
 	}
 	
 }
+
+/*
+//After 2 empty spaces: 2761596
+//After 4 empty spaces: Num possible duplicated solutions so far: 18268000
+Num possible duplicated solutions so far: 20295096
+Num unique solutions so far: 0
+num player 2 losing/tying solutions for a 5x5 board: 20295096
+Num of unique solutions for faster version: 0
+Searched where there were an EVEN number of empty cells left in the position
+*/
+
+
+/*
+ * 
+ * Num possible duplicated solutions so far: 16240656
+Num unique solutions so far: 0
+Solve Losing positions (or tying) with 5 empty spaces left:
+Printing order to solve:
+
+ * Num possible duplicated solutions so far: 37381452
+Num unique solutions so far: 0
+Solve Losing positions (or tying) with 7 empty spaces left:
+Printing order to solve:
+
+ * Num possible duplicated solutions so far: 38244068
+Num unique solutions so far: 0
+num player 1 losing/tying solutions for a 5x5 board: 38244068
+Num of unique solutions for faster version: 0
+Searched where there were an ODD number of empty cells left in the position
+Solution codes listed in order:
+*/

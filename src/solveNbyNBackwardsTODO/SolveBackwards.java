@@ -12,7 +12,7 @@ import solveUtil.SolveUtilFunctions;
 //TODO: need to debug!!!
 public class SolveBackwards {
 
-	public static int N =  3;
+	public static int N =  5;
 	public static int NUM_CELLS = N * N;
 	public static boolean FIND_PLAYER1_LOSSES = false;
 
@@ -214,7 +214,7 @@ public class SolveBackwards {
 			if( (isPlayer1Turn(current) == true && eval < 0.0)
 				|| (isPlayer1Turn(current) == false && eval > 0.0)) {
 				
-				
+				/*
 				System.out.println("Found solution.");
 
 				System.out.println("code: " + current.getUniqueCode());
@@ -226,8 +226,7 @@ public class SolveBackwards {
 				}
 				
 				current.draw();
-				System.out.println("TODO: record and check if it's an insta loss...");
-				
+				*/
 
 				//System.out.println(eval);
 				//System.out.println("code: " + current.getUniqueCode());
