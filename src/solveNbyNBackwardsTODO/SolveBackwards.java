@@ -12,11 +12,9 @@ import solveUtil.SolveUtilFunctions;
 //TODO: need to debug!!!
 public class SolveBackwards {
 
-	
-	//There's a bug with N=8... :(
-	public static int N = 4;
+	public static int N =  3;
 	public static int NUM_CELLS = N * N;
-	public static boolean FIND_PLAYER1_LOSSES = true;
+	public static boolean FIND_PLAYER1_LOSSES = false;
 
 	//num player 1 losing/tying solutions for a 4x4 board: 29340
 	//Num of unique solutions: 27342
@@ -30,7 +28,7 @@ public class SolveBackwards {
 	
 	public static void main(String[] args) {
 		
-		System.out.println("Start");
+		System.out.println("Start slower backwards solver");
 		
 		int emptySpaces;
 		
@@ -41,6 +39,8 @@ public class SolveBackwards {
 			searchPosWhereOddNumSpacesLeft = true;
 		}
 		
+		
+		//TODO: this is wrong!
 		//Find ties: (TODO: refind ties)
 		//solveForTiedFinalPositions();
 		//System.out.println("After solve for tie: " + codes.size());
@@ -80,7 +80,7 @@ public class SolveBackwards {
 			System.out.println("Searched where there were an EVEN number of empty cells left in the position");
 		}
 		
-		//debugPrintSolutionCodes();
+		debugPrintSolutionCodes();
 	}
 	
 
@@ -213,6 +213,8 @@ public class SolveBackwards {
 			
 			if( (isPlayer1Turn(current) == true && eval < 0.0)
 				|| (isPlayer1Turn(current) == false && eval > 0.0)) {
+				
+				
 				System.out.println("Found solution.");
 
 				System.out.println("code: " + current.getUniqueCode());

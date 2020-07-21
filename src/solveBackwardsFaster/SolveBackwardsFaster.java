@@ -14,10 +14,9 @@ public class SolveBackwardsFaster {
 
 	//TODO: only deal with 1 colour
 	
-	//There's a bug with N=8... :(
-	public static int N = 4;
+	public static int N = 3;
 	public static int NUM_CELLS = N * N;
-	public static boolean FIND_PLAYER1_LOSSES = true;
+	public static boolean FIND_PLAYER1_LOSSES = false;
 	
 	public static long pascalsTriangle[][] = UtilityFunctions.createPascalTriangle(NUM_CELLS + 1);
 
@@ -28,7 +27,7 @@ public class SolveBackwardsFaster {
 	
 	public static void main(String[] args) {
 		
-		System.out.println("Start faster");
+		System.out.println("Start faster backwards solver");
 		
 		int emptySpaces;
 		
@@ -39,6 +38,7 @@ public class SolveBackwardsFaster {
 			searchPosWhereOddNumSpacesLeft = true;
 		}
 		
+		//TODO: tihs is wrong (I find ties for one, but not the other)
 		//TODO Find ties
 		//solveForTiedFinalPositions();
 		
@@ -76,7 +76,7 @@ public class SolveBackwardsFaster {
 			System.out.println("Searched where there were an EVEN number of empty cells left in the position");
 		}
 		
-		//debugPrintSolutionCodes();
+		debugPrintSolutionCodes();
 		
 	}
 	
@@ -156,13 +156,15 @@ public class SolveBackwardsFaster {
 		
 		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();
 
-		//Edge case that I'm just going to ignore:
-		if(numPegToPlacesOnBoard == 0) {
-			return ret;
-		}
 		
 		int numLosingPegsNeeded = getNumLosingPegsNeeded(numPegToPlacesOnBoard);
 	
+
+		//Edge case that I'm just going to ignore:
+		if(numLosingPegsNeeded == 0 && numPegToPlacesOnBoard <= 1) {
+			return ret;
+		}
+		
 		//Try inserting another losing peg in current Coordinate:
 		boolean isP1Losing = isP1Losing(numPegToPlacesOnBoard);
 		
@@ -240,7 +242,7 @@ public class SolveBackwardsFaster {
 		if(SolveUtilFunctions.getNumSpacesPlayerCouldMove(current, isP1Losing) > currentNumWinningPlayerPieces) {
 			return new ArrayList<BigInteger>();
 		}
-		
+
 		boolean isP1WinningPegs = !isP1Losing;
 		
 		ArrayList<BigInteger> ret = new ArrayList<BigInteger>();
@@ -252,15 +254,24 @@ public class SolveBackwardsFaster {
 		}
 		
 		
+		// After adding the minimum amount of winning pegs to 'checkmate' the loser,
+		// we now have to try to add the rest to the required winning pegs.
+		// There are (numMovableLocation(or freeSpaceCodes.length) choose (num winning peg left to add)) combinations to check
 		int freeSpaceCodes[] = SolveUtilFunctions.getMovableLocations(minimalCheckmater, isP1WinningPegs);
 		
 		boolean combo[] = new boolean[freeSpaceCodes.length];
-		for(int i=0; i<combo.length; i++) {
-			if(i < currentNumWinningPlayerPieces -  numSpacesLosingPlayerCouldMove) {
-				combo[i] = true;
-			} else {
-				combo[i] = false;
+		if( currentNumWinningPlayerPieces -  numSpacesLosingPlayerCouldMove <= freeSpaceCodes.length) {
+			for(int i=0; i<combo.length; i++) {
+				if(i < currentNumWinningPlayerPieces -  numSpacesLosingPlayerCouldMove) {
+					combo[i] = true;
+				} else {
+					combo[i] = false;
+				}
 			}
+		} else {
+			//if numMovableLocation(or freeSpaceCodes.length) < num winning peg left to add,
+			//that means (numMovableLocation choose num winning peg left to add) = 0 and there's nothing to check
+			combo = null;
 		}
 
 
@@ -286,10 +297,12 @@ public class SolveBackwardsFaster {
 			}
 
 			if(comboBoard != null) {
+				
 				System.out.println("Solution:");
 				System.out.println("code: " + comboBoard.getUniqueCode());
 				comboBoard.draw();
 				numSolutions++;
+				
 				codes.add(comboBoard.getUniqueCode());
 			}
 		
