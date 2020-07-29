@@ -1,4 +1,4 @@
-package solveNbyNBackwardsTODO;
+package solveNbyNBackwardsSLOW;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -12,9 +12,9 @@ import solveUtil.SolveUtilFunctions;
 //TODO: need to debug!!!
 public class SolveBackwards {
 
-	public static int N =  5;
+	public static int N =  4;
 	public static int NUM_CELLS = N * N;
-	public static boolean FIND_PLAYER1_LOSSES = false;
+	public static boolean FIND_PLAYER1_LOSSES = true;
 
 	//num player 1 losing/tying solutions for a 4x4 board: 29340
 	//Num of unique solutions: 27342
@@ -27,6 +27,24 @@ public class SolveBackwards {
 	//No solution!
 	
 	public static void main(String[] args) {
+		getTies();
+	}
+
+	
+	public static void getTies() {
+
+		//TODO: this is wrong!
+		//Find ties: (TODO: refind ties)
+		solveForTiedFinalPositions();
+		System.out.println("After solve for tie: " + codes.size());
+		
+		//TODO: translate ties into losing positions 1-2 moves back.
+
+		debugPrintSolutionCodes();
+		
+	}
+	
+	public static void getLoses() {
 		
 		System.out.println("Start slower backwards solver");
 		
@@ -38,14 +56,6 @@ public class SolveBackwards {
 				(FIND_PLAYER1_LOSSES == false && N%2 == 0)) {
 			searchPosWhereOddNumSpacesLeft = true;
 		}
-		
-		
-		//TODO: this is wrong!
-		//Find ties: (TODO: refind ties)
-		//solveForTiedFinalPositions();
-		//System.out.println("After solve for tie: " + codes.size());
-		
-		//TODO: translate ties into losing positions 1-2 moves back.
 		
 		
 		//TODO: uncomment:
@@ -214,7 +224,7 @@ public class SolveBackwards {
 			if( (isPlayer1Turn(current) == true && eval < 0.0)
 				|| (isPlayer1Turn(current) == false && eval > 0.0)) {
 				
-				/*
+				
 				System.out.println("Found solution.");
 
 				System.out.println("code: " + current.getUniqueCode());
@@ -226,7 +236,7 @@ public class SolveBackwards {
 				}
 				
 				current.draw();
-				*/
+				
 
 				//System.out.println(eval);
 				//System.out.println("code: " + current.getUniqueCode());

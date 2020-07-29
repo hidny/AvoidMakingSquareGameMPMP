@@ -18,9 +18,9 @@ public class SolveBackwardsFaster {
 
 	//TODO: only deal with 1 colour
 	
-	public static int N = 6;
+	public static int N = 4;
 	public static int NUM_CELLS = N * N;
-	public static boolean FIND_PLAYER1_LOSSES = false;
+	public static boolean FIND_PLAYER1_LOSSES = true;
 	
 	public static long pascalsTriangle[][] = UtilityFunctions.createPascalTriangle(NUM_CELLS + 1);
 
@@ -28,8 +28,24 @@ public class SolveBackwardsFaster {
 	//num player 1 losing/tying solutions for a 4x4 board: 25110
 	//Searched where there were an EVEN number of empty cells left in the position
 	
-	
 	public static void main(String[] args) {
+		getTies();
+	}
+	
+	
+	public static void getTies() {
+
+		//TODO: tihs is wrong (I find ties for one, but not the other)
+		//TODO Find ties
+		solveForTiedFinalPositions();
+		
+		System.out.println("Ties:");
+
+		debugPrintSolutionCodes();
+		
+	}
+	
+	public static void getLosses() {
 		
 		System.out.println("Start faster backwards solver");
 		
@@ -42,9 +58,6 @@ public class SolveBackwardsFaster {
 			searchPosWhereOddNumSpacesLeft = true;
 		}
 		
-		//TODO: tihs is wrong (I find ties for one, but not the other)
-		//TODO Find ties
-		//solveForTiedFinalPositions();
 		
 		//TODO: translate ties into losing positions 1-2 moves back.
 		
@@ -311,15 +324,15 @@ public class SolveBackwardsFaster {
 			}
 
 			if(comboBoard != null) {
-				/*
+				
 				System.out.println("Solution:");
 				System.out.println("code: " + comboBoard.getUniqueCode());
 				comboBoard.draw();
-				*/
+				
 				numSolutions++;
 				
 				//TODO: use codes later...
-				//codes.add(comboBoard.getUniqueCode());
+				codes.add(comboBoard.getUniqueCode());
 			}
 		
 			
