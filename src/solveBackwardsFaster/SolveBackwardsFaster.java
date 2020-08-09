@@ -24,12 +24,19 @@ public class SolveBackwardsFaster {
 	
 	public static long pascalsTriangle[][] = UtilityFunctions.createPascalTriangle(NUM_CELLS + 1);
 
+
+	public static Scanner in = new Scanner(System.in);
+	
+	public static int numSolutions = 0;
+
+	public static HashSet<BigInteger> codes = new HashSet<BigInteger>();
+
 	//Not quite...
 	//num player 1 losing/tying solutions for a 4x4 board: 25110
 	//Searched where there were an EVEN number of empty cells left in the position
 	
 	public static void main(String[] args) {
-		getTies();
+		getLosses();
 	}
 	
 	
@@ -94,7 +101,7 @@ public class SolveBackwardsFaster {
 			System.out.println("Searched where there were an EVEN number of empty cells left in the position");
 		}
 		
-		debugPrintSolutionCodes();
+		//debugPrintSolutionCodes();
 		
 	}
 	
@@ -123,16 +130,11 @@ public class SolveBackwardsFaster {
 		}
 	}
 	
-	public static Scanner in = new Scanner(System.in);
-	
-	public static int numSolutions = 0;
-
-	public static HashSet<BigInteger> codes = new HashSet<BigInteger>();
 	
 	//I made it faster by only searching with 1 colour of peg first
 	// and then searching for the pegs of the other colour
 
-	//TODO: start with 4x4 case because it can be completely checked against AlphaBetaPrunPlayer
+	//TODO: start with 4x4 case because it can be completely checked against AlphaBetaPrunePlayer
 	
 	public static ArrayList<BigInteger> solveForTiedFinalPositions() {
 		return solvePositionsWhereNextMoveLoses(NUM_CELLS);
@@ -325,9 +327,9 @@ public class SolveBackwardsFaster {
 
 			if(comboBoard != null) {
 				
-				System.out.println("Solution:");
-				System.out.println("code: " + comboBoard.getUniqueCode());
-				comboBoard.draw();
+				//System.out.println("Solution:");
+				//System.out.println("code: " + comboBoard.getUniqueCode());
+				//comboBoard.draw();
 				
 				numSolutions++;
 				

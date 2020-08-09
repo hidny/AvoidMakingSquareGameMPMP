@@ -446,4 +446,53 @@ public class SolitaryBoard {
 		return ret;
 	}
 	
+	//TODO: Really inefficient, but It's a good 1st try
+	
+	public static SolitaryBoard createBoardFromCode(int size, BigInteger code) {
+		
+		SolitaryBoard current = new SolitaryBoard(size);
+		
+
+		BigInteger BASE = new BigInteger("" + Constants.NUM_STATES_PER_ELEMENT);
+		BigInteger TWO = new BigInteger("2");
+		
+		BigInteger currentCode = code;
+		
+		for(int i=0; i<current.table.length; i++) {
+			for(int j=0; j<current.table[i].length; j++) {
+				
+				int iBackwards = current.table.length - 1 - i;
+				int jBackwards = current.table[i].length - 1 - j;
+				
+				
+				BigInteger array[] = currentCode.divideAndRemainder(BASE);
+				
+				currentCode = array[0];
+				BigInteger remainder = array[1];
+				
+				if(remainder.compareTo(BigInteger.ZERO) == 0) {
+					//Do nothing
+				} else if(remainder.compareTo(new BigInteger("" + Constants.P1_COLOUR)) == 0) {
+					current = current.playMove(iBackwards, jBackwards, true);
+					
+				} else if(remainder.compareTo(new BigInteger("" + Constants.P2_COLOUR)) == 0) {
+					current = current.playMove(iBackwards, jBackwards, false);
+					
+				} else {
+					System.out.println("ERROR: unexpected answer in SolitaryBoard(int size, BigInteger code)");
+					System.exit(1);
+				}
+				
+				
+			}
+		}
+		
+		if(current.getUniqueCode().compareTo(code) != 0) {
+			System.out.println("ERROR: coding problem!");
+			System.exit(1);
+		}
+		
+		return current;
+	}
+	
 }
