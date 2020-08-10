@@ -3,16 +3,10 @@ package solveBackwardsFaster;
 import java.math.BigInteger;
 
 import env.Constants;
-import solveMPMP.SolitaryBoard;
 
 public class SolitaryFastBoard {
 
 	private int table[][];
-	
-	//TODO: muck around with not hard-copying the table later:
-	//private int delIndexes[] = new int[2];
-	//private int addIndexes[] = new int[2];
-	//END TODO
 	
 	public int[][] getTable() {
 		return table;
@@ -74,7 +68,8 @@ public class SolitaryFastBoard {
 		this.table[index / SolveAllTheWay.N][index % SolveAllTheWay.N] = pieceCode;
 	}
 	
-	
+	//This could be a little bit faster if the isP1turn condition is outside the for loops,
+	//but It's fast enough...
 	public boolean isAddingPegLegalMoveSlow(int index, boolean isP1turn) {
 		
 		int imove = index / SolveAllTheWay.N;
@@ -115,6 +110,8 @@ public class SolitaryFastBoard {
 		return true;
 		
 	}
+	
+	
 	
 	//Copied from Solitary Board
 	public BigInteger getUniqueCode() {

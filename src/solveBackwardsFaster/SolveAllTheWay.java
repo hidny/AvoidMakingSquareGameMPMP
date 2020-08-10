@@ -8,7 +8,7 @@ import solveMPMP.SolitaryBoard;
 
 public class SolveAllTheWay {
 
-	public static int N = 4;
+	public static int N = 5;
 	public static int NUM_CELLS = N * N;
 	
 	
@@ -23,7 +23,7 @@ public class SolveAllTheWay {
 		init();
 		
 		//getLosses(false);
-		getLosses(true);
+		getLosses(false);
 	}
 	
 	public static void init() {
@@ -64,7 +64,10 @@ public class SolveAllTheWay {
 		
 		
 		//Find loses
-		for(int i=1; 2*i <=NUM_CELLS; i++) {
+		for(int i=1; 
+				2*i <=NUM_CELLS
+				|| (searchPosWhereOddNumSpacesLeft && 2*i - 1 <=NUM_CELLS);
+			i++) {
 			
 			if(searchPosWhereOddNumSpacesLeft) {
 				emptySpaces = 2*i - 1;
@@ -105,7 +108,7 @@ public class SolveAllTheWay {
 					
 					
 					SolitaryFastBoard losingBoard = new SolitaryFastBoard(N, (BigInteger)losingCodes2MovesForward[j]);
-
+/*
 					//jSystem.out.println("Sanity:");
 					//SANITY TEST:
 					SolitaryBoard losingBoardTEST = SolitaryBoard.createBoardFromCode(N, (BigInteger)losingCodes2MovesForward[j]);
@@ -123,7 +126,7 @@ public class SolveAllTheWay {
 						System.out.println("ERROR: boards don't match!");
 						System.exit(1);
 					}
-					
+	*/				
 					//END SANITY TEST
 					
 					//TODO: materialize board 2 moves back:
@@ -137,22 +140,20 @@ public class SolveAllTheWay {
 						for(int p2RM = 0; p2RM < NUM_CELLS; p2RM++) {
 							if(losingBoard.getTable()[p2RM / N][p2RM % N] != Constants.P2_COLOUR) {
 								continue;
-							}
-							
-							//REMOVE P1 and P2
-							losingBoard.removePeg(p1RM);
-							losingBoard.removePeg(p2RM);
-							
-							
-							//Is losing position already taken?
-							if(PlayerLossCodes[emptySpaces].contains(losingBoard.getUniqueCode())) {
+								
+								//Is losing position already taken?
+							} else if(PlayerLossCodes[emptySpaces].contains(losingBoard.getUniqueCode())) {
 								//System.out.println("CONTINUE");
 								//System.exit(1);
 								continue;
 							}
 							//End is losing position already taken
+
+							//REMOVE P1 and P2
+							losingBoard.removePeg(p1RM);
+							losingBoard.removePeg(p2RM);
 							
-							
+
 							//TODO: function:
 							//Figure out if it's a losing position
 
@@ -212,8 +213,23 @@ public class SolveAllTheWay {
 								PlayerLossCodes[emptySpaces].add(losingBoard.getUniqueCode());
 								//System.out.println("BOOM!");
 								//System.exit(1);
+								
+								
+								/*
+								//SANITY TEST
+								SolitaryBoard losingBoardTEST2 = SolitaryBoard.createBoardFromCode(N, losingBoard.getUniqueCode());
+								if(NUM_CELLS - losingBoardTEST2.getNumPieces() != emptySpaces) {
+									System.out.println("ERROR: incorrect number of empty Spaces!");
+									losingBoardTEST2.draw();
+									System.exit(1);
+								}
+								
+								//END SANITY TEST
+								*/
+							} else {
+								//System.out.println("Correct");
 							}
-							//END 
+							//END TEST
 							
 							
 							//READ P1 and P2
@@ -232,7 +248,42 @@ public class SolveAllTheWay {
 			//END TODO: Translate losing positions into losing positions 2 moves back
 			
 			System.out.println("Number of losing positions for " + emptySpaces + " empty spaces: " + PlayerLossCodes[emptySpaces].size());
-			
+			/*//TODO: move elsewhere
+			if(emptySpaces == 7) {
+				System.out.println("Debug:");
+				
+				Object tmpBoards[] = PlayerLossCodes[emptySpaces].toArray();
+				
+				System.out.println("Num positions to go thru: " + tmpBoards.length);
+				
+				for(int j=0; j<tmpBoards.length; j++) {
+					
+					
+					SolitaryFastBoard losingBoard = new SolitaryFastBoard(N, (BigInteger)tmpBoards[j]);
+					//jSystem.out.println("Sanity:");
+					//SANITY TEST:
+					SolitaryBoard losingBoardTEST = SolitaryBoard.createBoardFromCode(N, (BigInteger)tmpBoards[j]);
+					for(int i2=0; i2<losingBoardTEST.getTable().length; i2++) {
+						for(int j2=0; j2<losingBoardTEST.getTable()[0].length; j2++) {
+							if(losingBoardTEST.getTable()[i2][j2] != losingBoard.getTable()[i2][j2]) {
+								System.out.println("ERROR: boards don't match!");
+								System.exit(1);
+							}
+						}
+					}
+					
+					if(losingBoard.getUniqueCode().compareTo(losingBoardTEST.getUniqueCode()) != 0) {
+
+						System.out.println("ERROR: boards don't match!");
+						System.exit(1);
+					}
+					
+					//TEST
+						System.out.println("Printing losing board:");
+						losingBoardTEST.draw();
+					
+				}
+			}*/
 			
 		}
 		
