@@ -6,9 +6,10 @@ import java.util.HashSet;
 import env.Constants;
 import solveMPMP.SolitaryBoard;
 
+//TODO N=3 contradicts results of other program... :(
 public class SolveAllTheWay {
 
-	public static int N = 5;
+	public static int N = 4;
 	public static int NUM_CELLS = N * N;
 	
 	
@@ -23,7 +24,7 @@ public class SolveAllTheWay {
 		init();
 		
 		//getLosses(false);
-		getLosses(false);
+		getLosses(true);
 	}
 	
 	public static void init() {
@@ -86,8 +87,18 @@ public class SolveAllTheWay {
 			//Clear the position codes found:
 			SolveBackwardsFaster.codes = new HashSet<BigInteger>();
 			//END TODO put in function
+			/*
+			//DEBUG:
+			Object losingCodes[] = PlayerLossCodes[emptySpaces].toArray();
+			for(int j=0; j<losingCodes.length; j++) {
+				SolitaryBoard losingBoardDEBUG = SolitaryBoard.createBoardFromCode(N, (BigInteger)losingCodes[j]);
+				System.out.println("Losing position " + j + ":");
+				losingBoardDEBUG.draw();
+				System.out.println();
+			}
 			
-			
+			//END DEBUG
+			*/
 			System.out.println("Number of immediate losing positions for " + emptySpaces + " empty spaces: " + PlayerLossCodes[emptySpaces].size());
 			
 			//TODO: translate losing positions into losing positions 2 moves back, unless were at the very start.
@@ -166,7 +177,8 @@ public class SolveAllTheWay {
 								}
 
 								//Check if position is illegal!
-								if(losingBoard.isAddingPegLegalMoveSlow(losingPlayerPlayInd, findP1Losses)) {
+								//TODO: function is bugged?
+								if(losingBoard.isAddingPegIllegalMoveSlow(losingPlayerPlayInd, findP1Losses)) {
 									continue;
 								}
 								
@@ -180,7 +192,7 @@ public class SolveAllTheWay {
 									}
 
 									//Check if position is losing!
-									if(losingBoard.isAddingPegLegalMoveSlow(winningPlayerPlayInd, findP1Losses == false)) {
+									if(losingBoard.isAddingPegIllegalMoveSlow(winningPlayerPlayInd, !findP1Losses)) {
 										continue;
 									}
 									
@@ -190,6 +202,8 @@ public class SolveAllTheWay {
 									if(PlayerLossCodes[emptySpaces - 2].contains(losingBoard.getUniqueCode())) {
 										//System.out.println("Found something!");
 										//System.exit(1);
+										
+										
 										
 										couldBeWinningWith1stMove = false;
 									}
@@ -226,6 +240,16 @@ public class SolveAllTheWay {
 								
 								//END SANITY TEST
 								*/
+								
+								/*
+								//DEBUG:
+								SolitaryBoard losingBoardDEBUG = SolitaryBoard.createBoardFromCode(N, losingBoard.getUniqueCode());
+								System.out.println("Losing position " + j + ":");
+								losingBoardDEBUG.draw();
+								System.out.println();
+								//END DEBUG
+								 */
+								
 							} else {
 								//System.out.println("Correct");
 							}

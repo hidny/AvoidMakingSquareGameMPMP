@@ -70,10 +70,10 @@ public class SolitaryFastBoard {
 	
 	//This could be a little bit faster if the isP1turn condition is outside the for loops,
 	//but It's fast enough...
-	public boolean isAddingPegLegalMoveSlow(int index, boolean isP1turn) {
+	public boolean isAddingPegIllegalMoveSlow(int index, boolean isP1turn) {
 		
 		int imove = index / SolveAllTheWay.N;
-		int jmove = index % SolveAllTheWay.N;; 
+		int jmove = index % SolveAllTheWay.N;
 		
 		for(int i=0; i<table.length; i++) {
 			for(int j=0; j<table.length; j++) {
@@ -91,13 +91,13 @@ public class SolitaryFastBoard {
 							if(table[i][j] == Constants.P1_COLOUR
 									&& table[imove - dx][jmove + dy] == Constants.P1_COLOUR
 									&& table[i - dx][j + dy] == Constants.P1_COLOUR) {
-								return false;
+								return true;
 							}
 						} else {
 							if(table[i][j] == Constants.P2_COLOUR
 									&& table[imove - dx][jmove + dy] == Constants.P2_COLOUR
 									&& table[i - dx][j + dy] == Constants.P2_COLOUR) {
-								return false;
+								return true;
 							}
 						}
 						
@@ -107,7 +107,7 @@ public class SolitaryFastBoard {
 		
 		}//END outer for loop
 		
-		return true;
+		return false;
 		
 	}
 	

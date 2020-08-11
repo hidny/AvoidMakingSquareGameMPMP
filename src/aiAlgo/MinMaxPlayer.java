@@ -25,7 +25,7 @@ public class MinMaxPlayer implements player.PlayerI {
 			for(int i=0; i<moveCode.length; i++) {
 				System.out.println("DEBUG: minmaxplayer Trying move code " + moveCode[i]);
 				double newEval = minimax(node.playMove(moveCode[i]), depth - 1);
-				if(newEval > eval) {
+				if(newEval >= eval) {
 					retMoveCode = moveCode[i];
 					eval = newEval;
 				}
@@ -44,7 +44,7 @@ public class MinMaxPlayer implements player.PlayerI {
 			for(int i=0; i<moveCode.length; i++) {
 				double newEval = minimax(node.playMove(moveCode[i]), depth - 1);
 				
-				if(newEval < eval) {
+				if(newEval <= eval) {
 					retMoveCode = moveCode[i];
 					eval = newEval;
 				}

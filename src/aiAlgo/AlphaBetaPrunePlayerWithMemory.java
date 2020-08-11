@@ -55,7 +55,7 @@ public class AlphaBetaPrunePlayerWithMemory implements player.PlayerI {
 			for(int i=0; i<moveCode.length; i++) {
 				System.out.println("DEBUG: alphaBetaPrunePlayerWithMemory1 Trying move code " + moveCode[i]);
 				double newEval = alphaBetaPrune(node.playMove(moveCode[i]), depth - 1);
-				if(newEval > eval) {
+				if(newEval >= eval) {
 					retMoveCode = moveCode[i];
 					eval = newEval;
 				}
@@ -75,7 +75,7 @@ public class AlphaBetaPrunePlayerWithMemory implements player.PlayerI {
 				System.out.println("DEBUG: alphaBetaPrunePlayerWithMemory1 Trying move code " + moveCode[i]);
 				double newEval = alphaBetaPrune(node.playMove(moveCode[i]), depth - 1);
 				
-				if(newEval < eval) {
+				if(newEval <= eval) {
 					retMoveCode = moveCode[i];
 					eval = newEval;
 				}

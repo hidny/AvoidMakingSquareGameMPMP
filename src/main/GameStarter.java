@@ -38,12 +38,23 @@ public class GameStarter {
 		//ComputerAlphaBetaMemVsAlphaBetaMem();
 		
 		//Best so far:
-		ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEval();
+		//ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEval();
 		
 		
 		//ComputerAlphaBetaVsAlphaBetaBothWithHalfWayEvalSucks();
 		//ComputerAlphaBetaMemVsAlphaBetaMemAndFudgeFactorEval();
 		//ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEvalMinSaveDepth();
+		
+		//ComputerAlphaBetaMemVsAlphaBetaMem();
+		//ComputerAlphaBetaVsHuman();
+		
+		ComputerAlphaBetaVsMinMax();
+	}
+	
+	
+	public static void ComputerAlphaBetaVsMinMax() {
+		System.out.println("Computer (alpha beta) vs Human");
+		PlayGame(new AlphaBetaPrunePlayer(), new MinMaxPlayer());
 		
 	}
 	
@@ -59,11 +70,6 @@ public class GameStarter {
 		
 	}
 	
-	public static void ComputerAlphaBetaVsAlphaBeta() {
-		System.out.println("Computer (alpha beta) vs Computer (alpha beta)");
-		PlayGame(new AlphaBetaPrunePlayer(), new ConsolePlayer());
-		
-	}
 	
 	public static void HumanVsAlphaBeta() {
 		System.out.println("Human vs Computer (alpha beta)");
