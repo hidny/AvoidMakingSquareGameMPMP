@@ -10,11 +10,15 @@ public class AlphaBetaPrunePlayer implements player.PlayerI {
 	public int getBestMove(Board node, int depth) {
 		boolean isMaximizingPlayer = node.isP1turn();
 		
+		//Depth shouldn't be more the the number of move the board can make:
+		depth = Math.min(depth, env.Constants.NUM_CELLS - node.getNumPieces());
+		
 		if(depth == 0 || node.currentPlayerCantMove() ) {
 			return -1;
 			
 		}
-		
+
+		System.out.println("Debug Depth: " + depth);
 		if(isMaximizingPlayer) {
 
 			int retMoveCode = -1;
@@ -25,17 +29,21 @@ public class AlphaBetaPrunePlayer implements player.PlayerI {
 			for(int i=0; i<moveCode.length; i++) {
 				System.out.println("DEBUG: alphaBetaPrunePlayer1 Trying move code " + moveCode[i]);
 				double newEval = alphaBetaPrune(node.playMove(moveCode[i]), depth - 1);
+				
+				System.out.println("eval: " + newEval);
 				if(newEval > eval) {
 					retMoveCode = moveCode[i];
 					eval = newEval;
 				}
 				
 			}
-			
+
+			System.out.println("Best eval found: " + eval);
+
 			return retMoveCode;
 			
 		} else {
-
+		
 			int retMoveCode = -1;
 			double eval = + Double.MAX_VALUE;
 			
@@ -45,11 +53,14 @@ public class AlphaBetaPrunePlayer implements player.PlayerI {
 				System.out.println("DEBUG: alphaBetaPrunePlayer2 Trying move code " + moveCode[i]);
 				double newEval = alphaBetaPrune(node.playMove(moveCode[i]), depth - 1);
 				
+				System.out.println("eval: " + newEval);
 				if(newEval < eval) {
 					retMoveCode = moveCode[i];
 					eval = newEval;
 				}
 			}
+			
+			System.out.println("Best eval found: " + eval);
 			
 			return retMoveCode;
 		}
@@ -69,8 +80,23 @@ public class AlphaBetaPrunePlayer implements player.PlayerI {
 		}
 		boolean isMaximizingPlayer = node.isP1turn();
 
-		if(depth == 0 || node.currentPlayerCantMove() ) {
-			return node.naiveShallowEval();
+		if(depth == 0) {
+			for(int i=0; i<node.getTable().length; i++) {
+				for(int j=0; j<node.getTable().length; j++) {
+					if(node.getTable()[i][j] == env.Constants.EMPTY) {
+						System.out.println("AHH!!");
+						System.exit(1);
+					}
+				}
+			}
+			return 0.0;
+		} else if(node.currentPlayerCantMove() && depth > 0) {
+			
+			if(isMaximizingPlayer) {
+				return - Double.MAX_VALUE;
+			} else {
+				return Double.MAX_VALUE;
+			}
 			
 		} else if(isMaximizingPlayer) {
 			double eval = - Double.MAX_VALUE;

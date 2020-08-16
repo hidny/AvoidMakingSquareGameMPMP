@@ -8,6 +8,7 @@ import aiAlgoevaluator.BasicEval;
 import aiAlgoevaluator.BasicEvalWithFraction;
 import aiAlgoevaluator.halfwayEvalSUCKS;
 import consolePlayer.ConsolePlayer;
+import consolePlayer.LossLookupPlayer;
 import env.Board;
 import env.Constants;
 import player.PlayerI;
@@ -34,7 +35,7 @@ public class GameStarter {
 		//TODO3: maybe having pegs that are aligned is bad?
 		
 		//ComputerHumanVsAlphaBeta();
-		//ComputerAlphaBetaVsAlphaBeta();
+		//ComputerAlphaBetaMemVsAlphaBetaMem();
 		//ComputerAlphaBetaMemVsAlphaBetaMem();
 		
 		//Best so far:
@@ -45,10 +46,25 @@ public class GameStarter {
 		//ComputerAlphaBetaMemVsAlphaBetaMemAndFudgeFactorEval();
 		//ComputerAlphaBetaMemVsAlphaBetaMemAndBasicEvalMinSaveDepth();
 		
-		//ComputerAlphaBetaMemVsAlphaBetaMem();
 		//ComputerAlphaBetaVsHuman();
 		
-		ComputerAlphaBetaVsMinMax();
+		//ComputerAlphaBetaVsMinMax();
+		//ComputerAlphaBetaMemVsAlphaBetaMem();
+		
+		//LossLookupPlayerVsComputerAlphaBeta();
+		ComputerAlphaBetaVsLossLookupPlayer();
+	}
+	
+	public static void LossLookupPlayerVsComputerAlphaBeta() {
+		System.out.println("Human Lookup player vs Computer (alpha beta)");
+		PlayGame(new LossLookupPlayer(), new AlphaBetaPrunePlayer());
+		
+	}
+	
+	public static void ComputerAlphaBetaVsLossLookupPlayer() {
+		System.out.println("Computer (alpha beta) vs Human Lookup player");
+		PlayGame(new AlphaBetaPrunePlayer(), new LossLookupPlayer());
+		
 	}
 	
 	

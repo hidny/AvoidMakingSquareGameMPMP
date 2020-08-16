@@ -389,33 +389,6 @@ public class Board {
 		}
 	}
 
-	//TODO: make less naive
-	public double naiveShallowEval() {
-		if(this.P1turn) {
-			for(int i=0; i<Constants.SIZE; i++) {
-				for(int j=0; j<Constants.SIZE; j++) {
-					if(P1Movable[i][j]) {
-						return 0.0;
-					}
-					
-				}
-			}
-			
-			return -Double.MAX_VALUE;
-		} else {
-			for(int i=0; i<Constants.SIZE; i++) {
-				for(int j=0; j<Constants.SIZE; j++) {
-					if(P2Movable[i][j]) {
-						return 0.0;
-					}
-					
-				}
-			}
-			
-			return Double.MAX_VALUE;
-		}
-	}
-
 	
 	//TODO: might be able to make it keep track of uniqueCode after every mode
 	// I might do it if I extend the Board class.

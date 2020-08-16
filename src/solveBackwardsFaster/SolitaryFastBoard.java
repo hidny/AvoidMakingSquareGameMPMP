@@ -54,7 +54,7 @@ public class SolitaryFastBoard {
 	}
 	
 	public void removePeg(int index) { 
-		this.table[index / SolveAllTheWay.N][index % SolveAllTheWay.N] = 0;
+		this.table[index / table.length][index % table.length] = 0;
 	}
 	
 	public void addPeg(int index, boolean isP1) {
@@ -65,15 +65,15 @@ public class SolitaryFastBoard {
 			pieceCode = Constants.P2_COLOUR;
 		}
 		
-		this.table[index / SolveAllTheWay.N][index % SolveAllTheWay.N] = pieceCode;
+		this.table[index / table.length][index % table.length] = pieceCode;
 	}
 	
 	//This could be a little bit faster if the isP1turn condition is outside the for loops,
 	//but It's fast enough...
 	public boolean isAddingPegIllegalMoveSlow(int index, boolean isP1turn) {
 		
-		int imove = index / SolveAllTheWay.N;
-		int jmove = index % SolveAllTheWay.N;
+		int imove = index / table.length;
+		int jmove = index % table.length;
 		
 		for(int i=0; i<table.length; i++) {
 			for(int j=0; j<table.length; j++) {

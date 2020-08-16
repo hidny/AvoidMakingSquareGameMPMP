@@ -40,6 +40,10 @@ public class AlphaBetaPrunePlayerWithMemory implements player.PlayerI {
 	public int getBestMove(Board node, int depth) {
 		boolean isMaximizingPlayer = node.isP1turn();
 		
+
+		//Depth shouldn't be more the the number of move the board can make:
+		depth = Math.min(depth, env.Constants.NUM_CELLS - node.getNumPieces());
+		
 		if(depth == 0 || node.currentPlayerCantMove() ) {
 			return -1;
 			
@@ -108,11 +112,26 @@ public class AlphaBetaPrunePlayerWithMemory implements player.PlayerI {
 
 		boolean isMaximizingPlayer = node.isP1turn();
 
-		if(depth == 0 || node.currentPlayerCantMove() ) {
-			return node.naiveShallowEval();
+		if(depth == 0) {
+			for(int i=0; i<node.getTable().length; i++) {
+				for(int j=0; j<node.getTable().length; j++) {
+					if(node.getTable()[i][j] == env.Constants.EMPTY) {
+						System.out.println("AHH!!");
+						System.exit(1);
+					}
+				}
+			}
+			return 0.0;
+		} else if(node.currentPlayerCantMove() && depth > 0) {
+			
+			if(isMaximizingPlayer) {
+				return - Double.MAX_VALUE;
+			} else {
+				return Double.MAX_VALUE;
+			}
 			
 		}
-		
+
 		BigInteger uniqueCode = node.getUniqueCode();
 
 			

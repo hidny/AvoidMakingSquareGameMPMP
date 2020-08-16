@@ -24,6 +24,9 @@ public class SolveAllTheWay {
 		init();
 		
 		//getLosses(false);
+		//Number of immediate losing positions for 4 empty spaces: 15506404
+		//Num positions to go thru: 2761596
+		
 		getLosses(true);
 	}
 	
@@ -37,6 +40,8 @@ public class SolveAllTheWay {
 		}
 		
 	}
+	
+	public static long numLosingPos = 0L;
 	
 	//TODO: get Draws!
 
@@ -153,16 +158,18 @@ public class SolveAllTheWay {
 								continue;
 								
 								//Is losing position already taken?
-							} else if(PlayerLossCodes[emptySpaces].contains(losingBoard.getUniqueCode())) {
-								//System.out.println("CONTINUE");
-								//System.exit(1);
-								continue;
 							}
 							//End is losing position already taken
 
 							//REMOVE P1 and P2
 							losingBoard.removePeg(p1RM);
 							losingBoard.removePeg(p2RM);
+							
+							if(PlayerLossCodes[emptySpaces].contains(losingBoard.getUniqueCode())) {
+								losingBoard.addPeg(p1RM, true);
+								losingBoard.addPeg(p2RM, false);
+								continue;
+							}
 							
 
 							//TODO: function:
@@ -186,7 +193,7 @@ public class SolveAllTheWay {
 								
 								boolean couldBeWinningWith1stMove = true;
 								
-								for(int winningPlayerPlayInd=0; winningPlayerPlayInd < NUM_CELLS && losingSoFar == true && couldBeWinningWith1stMove == true; winningPlayerPlayInd++) {
+								for(int winningPlayerPlayInd=0; winningPlayerPlayInd < NUM_CELLS && couldBeWinningWith1stMove == true; winningPlayerPlayInd++) {
 									if(losingBoard.getTable()[winningPlayerPlayInd / N][winningPlayerPlayInd % N] != Constants.EMPTY) {
 										continue;
 									}
@@ -223,8 +230,15 @@ public class SolveAllTheWay {
 							
 							//Add code:
 							if(losingSoFar == true) {
-								//Check code
+								//TODO: write to a file??
+								numLosingPos++;
+								
+								if(numLosingPos % 1000000 == 0) {
+									System.out.println("Num losing positions found with duplicates: " + numLosingPos);
+								}
+								
 								PlayerLossCodes[emptySpaces].add(losingBoard.getUniqueCode());
+								
 								//System.out.println("BOOM!");
 								//System.exit(1);
 								

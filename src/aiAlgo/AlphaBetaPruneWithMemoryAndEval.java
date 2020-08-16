@@ -59,6 +59,9 @@ public class AlphaBetaPruneWithMemoryAndEval implements player.PlayerI {
 	//TODO: maybe print the evals?
 	public int getBestMove(Board node, int depth) {
 		boolean isMaximizingPlayer = node.isP1turn();
+
+		//Depth shouldn't be more the the number of move the board can make:
+		depth = Math.min(depth, env.Constants.NUM_CELLS - node.getNumPieces());
 		
 		if(depth == 0 || node.currentPlayerCantMove() ) {
 			return -1;
@@ -138,16 +141,23 @@ public class AlphaBetaPruneWithMemoryAndEval implements player.PlayerI {
 
 		boolean isMaximizingPlayer = node.isP1turn();
 
-		if(depth == 0 || node.currentPlayerCantMove() ) {
-			
-			if(node.naiveShallowEval() == 0.0) {
-				System.out.println("MPMP Solution?");
-				node.draw();
-				System.out.println("END MPMP");
-				
-				return evalFunc.evalPosition(node);
+		if(depth == 0) {
+			for(int i=0; i<node.getTable().length; i++) {
+				for(int j=0; j<node.getTable().length; j++) {
+					if(node.getTable()[i][j] == env.Constants.EMPTY) {
+						System.out.println("AHH!!");
+						System.exit(1);
+					}
+				}
 			}
-			return node.naiveShallowEval();
+			return 0.0;
+		} else if(node.currentPlayerCantMove() && depth > 0) {
+			
+			if(isMaximizingPlayer) {
+				return - Double.MAX_VALUE;
+			} else {
+				return Double.MAX_VALUE;
+			}
 			
 		}
 		
